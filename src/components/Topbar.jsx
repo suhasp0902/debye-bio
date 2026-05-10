@@ -2,7 +2,7 @@ import { Play, Shield, Download, File, FolderOpen, Save, Settings, Grid, ZoomIn,
 import { useState } from 'react';
 import { useReactFlow } from '@xyflow/react';
 
-export default function Topbar({ scenario, setScenario, onSimulate, onRunDRC, onExport, onNewProject, onSaveProject, onOpenProject, showGrid, setShowGrid }) {
+export default function Topbar({ scenario, setScenario, onSimulate, onRunDRC, onExport, onNewProject, onSaveProject, onOpenProject, onClearCanvas, showGrid, setShowGrid }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { zoomIn, zoomOut, fitView } = useReactFlow();
   
