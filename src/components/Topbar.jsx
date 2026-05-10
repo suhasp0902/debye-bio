@@ -1,8 +1,10 @@
 import { Play, Shield, Download, File, FolderOpen, Save, Settings, Grid, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
 import { useState } from 'react';
+import { useReactFlow } from '@xyflow/react';
 
-export default function Topbar({ scenario, setScenario, onSimulate, onRunDRC, onExport, onNewProject }) {
+export default function Topbar({ scenario, setScenario, onSimulate, onRunDRC, onExport, onNewProject, onSaveProject, onOpenProject, showGrid, setShowGrid }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { zoomIn, zoomOut, fitView } = useReactFlow();
   
   return (
     <div className="flex flex-col shrink-0 border-b border-border z-30 relative">
@@ -56,10 +58,10 @@ export default function Topbar({ scenario, setScenario, onSimulate, onRunDRC, on
         <button onClick={onNewProject} className="p-1.5 text-text-muted hover:text-text-primary hover:bg-surface-raised rounded tooltip-trigger" title="New Blank Project">
           <File className="w-4 h-4" />
         </button>
-        <button className="p-1.5 text-text-muted hover:text-text-primary hover:bg-surface-raised rounded tooltip-trigger" title="Open Project">
+        <button onClick={onOpenProject} className="p-1.5 text-text-muted hover:text-text-primary hover:bg-surface-raised rounded tooltip-trigger" title="Open Project">
           <FolderOpen className="w-4 h-4" />
         </button>
-        <button className="p-1.5 text-text-muted hover:text-text-primary hover:bg-surface-raised rounded tooltip-trigger" title="Save Project">
+        <button onClick={onSaveProject} className="p-1.5 text-text-muted hover:text-text-primary hover:bg-surface-raised rounded tooltip-trigger" title="Save Project">
           <Save className="w-4 h-4" />
         </button>
         
@@ -77,16 +79,16 @@ export default function Topbar({ scenario, setScenario, onSimulate, onRunDRC, on
 
         <div className="h-5 w-px bg-border mx-2"></div>
 
-        <button className="p-1.5 text-text-muted hover:text-text-primary hover:bg-surface-raised rounded tooltip-trigger" title="Show/Hide Grid">
+        <button onClick={() => setShowGrid(!showGrid)} className={`p-1.5 rounded tooltip-trigger ${showGrid ? 'text-accent-primary bg-accent-primary/10' : 'text-text-muted hover:text-text-primary hover:bg-surface-raised'}`} title="Show/Hide Grid">
           <Grid className="w-4 h-4" />
         </button>
-        <button className="p-1.5 text-text-muted hover:text-text-primary hover:bg-surface-raised rounded tooltip-trigger" title="Zoom In">
+        <button onClick={() => zoomIn()} className="p-1.5 text-text-muted hover:text-text-primary hover:bg-surface-raised rounded tooltip-trigger" title="Zoom In">
           <ZoomIn className="w-4 h-4" />
         </button>
-        <button className="p-1.5 text-text-muted hover:text-text-primary hover:bg-surface-raised rounded tooltip-trigger" title="Zoom Out">
+        <button onClick={() => zoomOut()} className="p-1.5 text-text-muted hover:text-text-primary hover:bg-surface-raised rounded tooltip-trigger" title="Zoom Out">
           <ZoomOut className="w-4 h-4" />
         </button>
-        <button className="p-1.5 text-text-muted hover:text-text-primary hover:bg-surface-raised rounded tooltip-trigger" title="Fit View">
+        <button onClick={() => fitView({ duration: 800 })} className="p-1.5 text-text-muted hover:text-text-primary hover:bg-surface-raised rounded tooltip-trigger" title="Fit View">
           <Maximize className="w-4 h-4" />
         </button>
 

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { ReactFlowProvider } from '@xyflow/react';
 import Topbar from './components/Topbar';
 import PaletteSidebar from './components/PaletteSidebar';
 import Canvas from './components/Canvas';
@@ -29,6 +28,7 @@ export default function App() {
   
   const [externalMessage, setExternalMessage] = useState('');
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [showGrid, setShowGrid] = useState(true);
 
   const addLog = (msg, type = 'info') => {
     const time = new Date().toLocaleTimeString('en-US', { hour12: false });
@@ -207,6 +207,27 @@ export default function App() {
     addLog('New Blank Project created.');
   };
 
+  const handleSaveProject = () => {
+    const data = JSON.stringify({ nodes, edges, scenarioId });
+    localStorage.setItem('debye_project', data);
+    addToast('Project saved successfully', 'success');
+    addLog('Project saved to local storage.', 'success');
+  };
+
+  const handleOpenProject = () => {
+    const data = localStorage.getItem('debye_project');
+    if (data) {
+      const parsed = JSON.parse(data);
+      setNodes(parsed.nodes || []);
+      setEdges(parsed.edges || []);
+      setScenarioId(parsed.scenarioId || null);
+      addToast('Project loaded', 'success');
+      addLog('Project loaded from local storage.', 'success');
+    } else {
+      addToast('No saved project found', 'warning');
+    }
+  };
+
   return (
     <div className="h-screen w-screen flex flex-col bg-background text-text-primary overflow-hidden font-sans">
       <Toast toasts={toasts} removeToast={() => {}} />
@@ -223,19 +244,23 @@ export default function App() {
         onRunDRC={handleRunDRC}
         onExport={handleExport}
         onNewProject={handleNewProject}
+        onSaveProject={handleSaveProject}
+        onOpenProject={handleOpenProject}
+        showGrid={showGrid}
+        setShowGrid={setShowGrid}
       />
       
       <div className="flex-1 flex min-h-0 relative">
         <PaletteSidebar />
         
         <div className="flex-1 flex flex-col relative min-w-0">
-          <ReactFlowProvider>
             <Canvas 
               scenarioId={scenarioId}
               nodes={nodes}
               setNodes={setNodes}
               edges={edges}
               setEdges={setEdges}
+              showGrid={showGrid}
               setSelectedNode={(node) => {
                 setSelectedNode(node);
                 if (node) setActiveTab('properties');
@@ -243,7 +268,6 @@ export default function App() {
               onContextMenuExplain={(msg) => setExternalMessage(msg)}
               onNodesChangeParent={handleNodesChangeParent}
             />
-          </ReactFlowProvider>
           
           <BottomPanel 
             simulationData={simulationData}

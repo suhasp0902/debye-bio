@@ -13,10 +13,12 @@ const nodeTypes = {
 };
 
 export default function Canvas({ 
+  scenarioId,
   nodes, 
   setNodes, 
   edges, 
   setEdges, 
+  showGrid,
   setSelectedNode, 
   onContextMenuExplain,
   onNodesChangeParent
@@ -107,7 +109,7 @@ export default function Canvas({
         proOptions={{ hideAttribution: true }}
         className="debye-canvas"
       >
-        <Background />
+        {showGrid && <Background />}
         <Controls position="bottom-left" className="!bg-surface !border-border !fill-text-primary shadow-lg" />
         
         {nodes.length === 0 && (
