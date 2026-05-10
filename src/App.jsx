@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Topbar from './components/Topbar';
 import PaletteSidebar from './components/PaletteSidebar';
 import Canvas from './components/Canvas';
@@ -29,6 +29,7 @@ export default function App() {
   const [externalMessage, setExternalMessage] = useState('');
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [showGrid, setShowGrid] = useState(true);
+  const fileInputRef = useRef(null);
 
   const addLog = (msg, type = 'info') => {
     const time = new Date().toLocaleTimeString('en-US', { hour12: false });
@@ -209,27 +210,65 @@ export default function App() {
 
   const handleSaveProject = () => {
     const data = JSON.stringify({ nodes, edges, scenarioId });
-    localStorage.setItem('debye_project', data);
-    addToast('Project saved successfully', 'success');
-    addLog('Project saved to local storage.', 'success');
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = scenarioId === null ? 'Untitled.dsn' : `Project_${scenarioId}.dsn`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    addToast('Project saved to device', 'success');
+    addLog('Project saved to device as .dsn file.', 'success');
   };
 
   const handleOpenProject = () => {
-    const data = localStorage.getItem('debye_project');
-    if (data) {
-      const parsed = JSON.parse(data);
-      setNodes(parsed.nodes || []);
-      setEdges(parsed.edges || []);
-      setScenarioId(parsed.scenarioId || null);
-      addToast('Project loaded', 'success');
-      addLog('Project loaded from local storage.', 'success');
-    } else {
-      addToast('No saved project found', 'warning');
-    }
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const parsed = JSON.parse(event.target.result);
+        setNodes(parsed.nodes || []);
+        setEdges(parsed.edges || []);
+        setScenarioId(parsed.scenarioId || null);
+        addToast('Project loaded from file', 'success');
+        addLog(`Loaded project from ${file.name}`, 'success');
+      } catch (err) {
+        addToast('Failed to parse .dsn file', 'error');
+        addLog(`Error parsing file: ${err.message}`, 'error');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = ''; // Reset input
+  };
+
+  const handleClearCanvas = () => {
+    setNodes([]);
+    setEdges([]);
+    setSimulationData(null);
+    setDrcResults(null);
+    setSelectedNode(null);
+    addToast('Canvas cleared', 'info');
+    addLog('Canvas cleared by user.');
   };
 
   return (
     <div className="h-screen w-screen flex flex-col bg-background text-text-primary overflow-hidden font-sans">
+      <input 
+        type="file" 
+        accept=".dsn,.json" 
+        ref={fileInputRef} 
+        onChange={handleFileChange} 
+        style={{ display: 'none' }} 
+      />
       <Toast toasts={toasts} removeToast={() => {}} />
       <AiPromptModal 
         isOpen={isAiModalOpen} 
@@ -246,6 +285,7 @@ export default function App() {
         onNewProject={handleNewProject}
         onSaveProject={handleSaveProject}
         onOpenProject={handleOpenProject}
+        onClearCanvas={handleClearCanvas}
         showGrid={showGrid}
         setShowGrid={setShowGrid}
       />
