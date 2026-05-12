@@ -188,7 +188,7 @@ export default function LandingPage() {
       {/* HERO STATUS */}
       <div className="hero-status">
         <div className="pulse-dot"></div>
-        <span>EDA Engine Online</span>
+        <span>Engine Online</span>
       </div>
       <div className="scroll-indicator">
         <span>Scroll</span>
@@ -202,7 +202,7 @@ export default function LandingPage() {
 
         <div className="hero-inner">
           <div className="label reveal reveal-d1">
-            <span className="label-gold">Debye Bio — EDA S26</span>
+            <span className="label-gold">Debye Bio</span>
           </div>
 
           <div className="headline-xl reveal reveal-d2">
