@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Topbar from './components/Topbar';
 import PaletteSidebar from './components/PaletteSidebar';
 import Canvas from './components/Canvas';
@@ -29,6 +29,7 @@ export default function App() {
   const [externalMessage, setExternalMessage] = useState('');
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [showGrid, setShowGrid] = useState(true);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const fileInputRef = useRef(null);
 
   const addLog = (msg, type = 'info') => {
@@ -84,8 +85,8 @@ export default function App() {
     }
   }, [scenarioId]);
 
-  const handleSimulate = () => {
-    if (nodes.length === 0) return;
+  const handleSimulate = useCallback(() => {
+    if (nodes.length === 0) { addToast('Canvas is empty — add components first', 'warning'); return; }
     setActiveTab('simulation');
     setSimRunning(true);
     setSimulationData(null);
@@ -94,14 +95,15 @@ export default function App() {
       const data = runSimulation(nodes, scenarioId);
       setSimulationData(data);
       setSimRunning(false);
-      addLog(`Mixed-Signal Simulation complete — 1.8ms`, 'success');
+      addLog(`Mixed-Signal Simulation complete — Cole-Cole + Randles model`, 'success');
+      addLog(`Tissue: ${data.tissue} | Material: ${data.material} | Electrode: ${data.electrodeArea} µm²`);
       addLog(`Impedance @ 1kHz: ${data.impedance1kHz} | Total noise: ${data.noiseTotal} µVrms | SNR: ${data.snr} dB`);
       addToast('Simulation complete');
     }, 1500);
-  };
+  }, [nodes, scenarioId]);
 
-  const handleRunDRC = () => {
-    if (nodes.length === 0) return;
+  const handleRunDRC = useCallback(() => {
+    if (nodes.length === 0) { addToast('Canvas is empty — add components first', 'warning'); return; }
     setActiveTab('drc');
     setDrcRunning(true);
     setDrcResults(null);
@@ -109,23 +111,26 @@ export default function App() {
     setNodes(nds => nds.map(n => ({ ...n, data: { ...n.data, status: undefined } })));
 
     setTimeout(() => {
-      const results = runDRC(nodes, scenarioId);
+      const results = runDRC(nodes, scenarioId, edges);
       setDrcResults(results);
       setDrcRunning(false);
       
       if (results.errors.length > 0) {
          setNodes(nds => nds.map(n => {
-            const hasError = results.errors.some(err => n.data.role === err.affected || n.data.label === err.affected || `${n.data.label} node` === err.affected || `${n.data.role} node` === err.affected || err.affected.includes(n.data.role) || err.affected.includes(n.data.label));
+            const hasError = results.errors.some(err =>
+              err.affected === n.data.label ||
+              err.affected.toLowerCase().includes((n.data.label || '').toLowerCase())
+            );
             return hasError ? { ...n, data: { ...n.data, status: 'error' } } : n;
          }));
          addToast('DRC found issues — review below', 'warning');
-         addLog(`DRC complete — ${results.errors.length} error, ${results.warnings.length} warnings, ${results.passed} passed`, 'error');
+         addLog(`DRC complete — ${results.errors.length} errors, ${results.warnings.length} warnings, ${results.passed} checks passed`, 'error');
       } else {
-         addToast('DRC passed successfully', 'success');
-         addLog(`DRC complete — 0 errors`, 'success');
+         addToast('DRC passed — all checks clear', 'success');
+         addLog(`DRC complete — 0 errors, ${results.warnings.length} warnings, ${results.passed} checks passed`, 'success');
       }
     }, 800);
-  };
+  }, [nodes, edges, scenarioId]);
 
   const handleUpdateNode = (id, newData) => {
     setNodes(nds => nds.map(n => {
@@ -140,6 +145,7 @@ export default function App() {
     }
     
     addToast('Node properties updated', 'success');
+    setHasUnsavedChanges(true);
     
     setTimeout(() => {
         if (simulationData) handleSimulate();
@@ -198,6 +204,17 @@ export default function App() {
     }, 1500);
   };
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === 'F9') { e.preventDefault(); handleRunDRC(); }
+      if (e.key === 'F10') { e.preventDefault(); handleSimulate(); }
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); handleSaveProject && handleSaveProject(); }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [handleRunDRC, handleSimulate]);
+
   const handleNewProject = () => {
     setScenarioId(null);
     setNodes([]);
@@ -205,23 +222,25 @@ export default function App() {
     setSimulationData(null);
     setDrcResults(null);
     setSelectedNode(null);
+    setHasUnsavedChanges(false);
     addLog('New Blank Project created.');
   };
 
   const handleSaveProject = () => {
-    const data = JSON.stringify({ nodes, edges, scenarioId });
+    const projectName = scenarioId === null ? 'Untitled' : `Project_${scenarioId}`;
+    const data = JSON.stringify({ nodes, edges, scenarioId, savedAt: new Date().toISOString() }, null, 2);
     const blob = new Blob([data], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = scenarioId === null ? 'Untitled.dsn' : `Project_${scenarioId}.dsn`;
+    a.download = `${projectName}.dsn`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-
+    setHasUnsavedChanges(false);
     addToast('Project saved to device', 'success');
-    addLog('Project saved to device as .dsn file.', 'success');
+    addLog(`Project saved as "${projectName}.dsn"`, 'success');
   };
 
   const handleOpenProject = () => {
@@ -239,6 +258,7 @@ export default function App() {
         setNodes(parsed.nodes || []);
         setEdges(parsed.edges || []);
         setScenarioId(parsed.scenarioId || null);
+        setHasUnsavedChanges(false);
         addToast('Project loaded from file', 'success');
         addLog(`Loaded project from ${file.name}`, 'success');
       } catch (err) {
@@ -288,6 +308,8 @@ export default function App() {
         onClearCanvas={handleClearCanvas}
         showGrid={showGrid}
         setShowGrid={setShowGrid}
+        hasUnsavedChanges={hasUnsavedChanges}
+        nodeCount={nodes.length}
       />
       
       <div className="flex-1 flex min-h-0 relative">
@@ -306,7 +328,11 @@ export default function App() {
                 if (node) setActiveTab('properties');
               }}
               onContextMenuExplain={(msg) => setExternalMessage(msg)}
-              onNodesChangeParent={handleNodesChangeParent}
+              onNodesChangeParent={(changes) => {
+                handleNodesChangeParent(changes);
+                if (changes.some(c => c.type !== 'select')) setHasUnsavedChanges(true);
+              }}
+              onConnect={() => setHasUnsavedChanges(true)}
             />
           
           <BottomPanel 

@@ -2,7 +2,7 @@ import { Play, Shield, Download, File, FolderOpen, Save, Settings, Grid, ZoomIn,
 import { useState } from 'react';
 import { useReactFlow } from '@xyflow/react';
 
-export default function Topbar({ scenario, setScenario, onSimulate, onRunDRC, onExport, onNewProject, onSaveProject, onOpenProject, onClearCanvas, showGrid, setShowGrid }) {
+export default function Topbar({ scenario, setScenario, onSimulate, onRunDRC, onExport, onNewProject, onSaveProject, onOpenProject, onClearCanvas, showGrid, setShowGrid, hasUnsavedChanges, nodeCount }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { zoomIn, zoomOut, fitView } = useReactFlow();
   
@@ -13,8 +13,9 @@ export default function Topbar({ scenario, setScenario, onSimulate, onRunDRC, on
         <div className="flex items-center gap-2 pr-4 border-r border-border/50">
           <span className="text-accent-primary font-bold tracking-wider">DEBYE</span>
         </div>
-        
-        <div className="flex px-2 space-x-1">
+
+        <div className="flex px-2 items-center flex-1">
+          <div className="flex space-x-1">
           {/* File Menu */}
           <div className="relative group">
             <button className="px-3 py-1 text-text-secondary hover:bg-surface-raised hover:text-text-primary rounded cursor-default">File</button>
@@ -104,11 +105,28 @@ export default function Topbar({ scenario, setScenario, onSimulate, onRunDRC, on
             </div>
           </div>
         </div>
-        
-        <div className="ml-auto text-text-muted text-[11px] flex items-center gap-3">
-          <span>{scenario === null ? 'Untitled.dsn' : scenario === 0 ? 'AI Generated.dsn' : `Example_${scenario}.dsn`}</span>
-          <div className="w-6 h-6 rounded-full bg-accent-primary/20 border border-accent-primary/50 flex items-center justify-center text-[10px] font-bold text-accent-primary">
-            FD
+
+        {/* Dynamic Project Title & Status */}
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 pointer-events-none">
+          <span className="text-text-muted text-[11px] font-medium tracking-wide">
+            {scenario === null ? 'Untitled.dsn' : `Project_0${scenario}.dsn`}
+          </span>
+          {hasUnsavedChanges && (
+            <div className="w-1.5 h-1.5 rounded-full bg-accent-primary animate-pulse" title="Unsaved changes"></div>
+          )}
+        </div>
+
+        <div className="ml-auto flex items-center gap-4 text-[11px] text-text-muted font-medium pr-2">
+          <div className="flex items-center gap-1.5">
+            <div className="w-1 h-1 rounded-full bg-green-500"></div>
+            <span>Connected</span>
+          </div>
+          <div className="flex items-center gap-1.5 border-l border-border/30 pl-4">
+            <span className="text-text-primary">{nodeCount}</span>
+            <span>Objects</span>
+          </div>
+          <div className="flex items-center gap-1.5 border-l border-border/30 pl-4">
+             <span>V1.2.0</span>
           </div>
         </div>
       </div>

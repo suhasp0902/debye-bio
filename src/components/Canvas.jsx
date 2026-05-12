@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { ReactFlow, Controls, Background, applyNodeChanges, applyEdgeChanges, addEdge, Panel } from '@xyflow/react';
+import { ReactFlow, Controls, Background, MiniMap, applyNodeChanges, applyEdgeChanges, addEdge, Panel } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
 import BiologyNode from './nodes/BiologyNode';
@@ -12,6 +12,12 @@ const nodeTypes = {
   material: MaterialNode,
 };
 
+const NODE_COLORS = {
+  biology: '#22D3EE',
+  electronics: '#6366F1',
+  material: '#A78BFA',
+};
+
 export default function Canvas({ 
   scenarioId,
   nodes, 
@@ -21,7 +27,8 @@ export default function Canvas({
   showGrid,
   setSelectedNode, 
   onContextMenuExplain,
-  onNodesChangeParent
+  onNodesChangeParent,
+  onConnect: onConnectParent
 }) {
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
 
@@ -34,13 +41,24 @@ export default function Canvas({
   );
   
   const onEdgesChange = useCallback(
-    (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
-    [setEdges]
+    (changes) => {
+      setEdges((eds) => applyEdgeChanges(changes, eds));
+      onConnectParent();
+    },
+    [setEdges, onConnectParent]
   );
   
   const onConnect = useCallback(
-    (params) => setEdges((eds) => addEdge({ ...params, animated: true, data: { type: 'mixed' }, style: { stroke: '#818CF8', strokeWidth: 2 } }, eds)),
-    [setEdges]
+    (params) => {
+      setEdges((eds) => addEdge({ 
+        ...params, 
+        animated: true, 
+        data: { type: 'mixed' }, 
+        style: { stroke: '#818CF8', strokeWidth: 2 } 
+      }, eds));
+      onConnectParent();
+    },
+    [setEdges, onConnectParent]
   );
 
   const onDragOver = useCallback((event) => {
@@ -55,9 +73,7 @@ export default function Canvas({
       const type = event.dataTransfer.getData('application/reactflow');
       const label = event.dataTransfer.getData('application/label');
 
-      if (typeof type === 'undefined' || !type) {
-        return;
-      }
+      if (typeof type === 'undefined' || !type) return;
 
       const position = reactFlowInstance.screenToFlowPosition({
         x: event.clientX,
@@ -68,7 +84,7 @@ export default function Canvas({
         id: `node_${Date.now()}`,
         type,
         position,
-        data: { label: label, role: label },
+        data: { label, role: label },
       };
 
       setNodes((nds) => nds.concat(newNode));
@@ -76,21 +92,17 @@ export default function Canvas({
     [reactFlowInstance, setNodes]
   );
 
-  const onNodeClick = (_, node) => {
-    setSelectedNode(node);
-  };
+  const onNodeClick = (_, node) => setSelectedNode(node);
 
   const onNodeContextMenu = (event, node) => {
     event.preventDefault();
     onContextMenuExplain(`Explain this component: ${node.data.label || node.type}`);
   };
 
-  const onPaneClick = () => {
-    setSelectedNode(null);
-  };
+  const onPaneClick = () => setSelectedNode(null);
 
   return (
-    <div className="flex-1 h-full relative" ref={(ref) => { if (ref) ref.focus() }}>
+    <div className="flex-1 h-full relative">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -106,17 +118,46 @@ export default function Canvas({
         onPaneClick={onPaneClick}
         fitView
         connectionRadius={40}
+        deleteKeyCode="Delete"
         proOptions={{ hideAttribution: true }}
         className="debye-canvas"
       >
-        {showGrid && <Background />}
-        <Controls position="bottom-left" className="!bg-surface !border-border !fill-text-primary shadow-lg" />
-        
+        {showGrid && <Background color="#2a2a3a" gap={24} size={1} />}
+        <Controls position="bottom-left" />
+        <MiniMap 
+          position="bottom-right"
+          nodeColor={(node) => NODE_COLORS[node.type] || '#4B5563'}
+          nodeStrokeWidth={2}
+          maskColor="rgba(10, 10, 18, 0.8)"
+          style={{
+            backgroundColor: '#13131f',
+            border: '1px solid #2a2a3a',
+            borderRadius: '6px',
+          }}
+        />
+
         {nodes.length === 0 && (
-          <Panel position="center" className="text-center text-text-muted">
-            <div className="text-4xl mb-4 opacity-50">+</div>
-            <div className="font-medium">Drop components here to start designing</div>
-            <div className="text-sm mt-1">or select a scenario from the top bar</div>
+          <Panel position="center">
+            <div className="text-center pointer-events-none select-none">
+              <div className="text-7xl mb-6 opacity-20">⬡</div>
+              <div className="text-text-primary font-semibold text-base mb-1">
+                Canvas is empty
+              </div>
+              <div className="text-text-muted text-sm mb-6">
+                Drag a component from the left palette to begin
+              </div>
+              <div className="flex gap-3 justify-center pointer-events-auto">
+                <div className="text-xs text-text-muted bg-surface-raised border border-border rounded px-3 py-1.5">
+                  F10 → Simulate
+                </div>
+                <div className="text-xs text-text-muted bg-surface-raised border border-border rounded px-3 py-1.5">
+                  F9 → Run DRC
+                </div>
+                <div className="text-xs text-text-muted bg-surface-raised border border-border rounded px-3 py-1.5">
+                  Del → Remove node
+                </div>
+              </div>
+            </div>
           </Panel>
         )}
       </ReactFlow>
