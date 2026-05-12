@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import ThreeScene from '../components/ThreeScene';
 import '../LandingPage.css';
 
 export default function LandingPage() {
@@ -76,10 +75,49 @@ export default function LandingPage() {
 
     const barObs = new IntersectionObserver((entries) => {
       entries.forEach(e => {
-        if (e.isIntersecting) e.target.style.width = '72%';
+        if (e.isIntersecting) {
+          const fill = e.target;
+          fill.style.width = '72%';
+        }
       });
     }, { threshold: 0.3 });
     bars.forEach(b => barObs.observe(b));
+
+    // Noise bars logic
+    const noiseSection = document.getElementById('noise-bars');
+    const noiseObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const allFills = document.querySelectorAll('.noise-fill');
+          allFills.forEach((f, i) => {
+            setTimeout(() => {
+              f.style.width = f.dataset.w;
+            }, i * 180);
+          });
+        }
+      });
+    }, { threshold: 0.3 });
+    if (noiseSection) noiseObs.observe(noiseSection);
+
+    // Impedance curve logic
+    const simVisual = document.getElementById('sim-visual');
+    const curveObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const impCurve = document.getElementById('imp-curve');
+          const phaseCurve = document.getElementById('phase-curve');
+          if (impCurve) {
+            impCurve.style.transition = 'stroke-dashoffset 2s cubic-bezier(0.4,0,0.2,1)';
+            impCurve.style.strokeDashoffset = '0';
+          }
+          if (phaseCurve) {
+            phaseCurve.style.transition = 'stroke-dashoffset 2.2s cubic-bezier(0.4,0,0.2,1) 0.3s';
+            phaseCurve.style.strokeDashoffset = '0';
+          }
+        }
+      });
+    }, { threshold: 0.2 });
+    if (simVisual) curveObs.observe(simVisual);
 
     const chapObs = new IntersectionObserver((entries) => {
       entries.forEach(e => {
@@ -87,7 +125,7 @@ export default function LandingPage() {
           const id = e.target.id;
           const chapMap = {
             'hero': 1, 'problem': 2, 'solution': 3, 'simulation': 4,
-            'drc': 5, 'platform': 6, 'market': 7, 'analogy': 8, 'cta-section': 9
+            'drc': 5, 'platform': 6, 'cta-section': 7
           };
           if (chapMap[id]) triggerFlash(chapMap[id]);
         }
@@ -121,6 +159,8 @@ export default function LandingPage() {
       ruleObs.disconnect();
       barObs.disconnect();
       chapObs.disconnect();
+      noiseObs.disconnect();
+      curveObs.disconnect();
     };
   }, []);
 
@@ -137,9 +177,10 @@ export default function LandingPage() {
       <nav className="landing-nav">
         <div className="nav-logo">D<span>E</span>BYE</div>
         <ul className="nav-links">
-          <li><a href="#problem" className="active">Problem</a></li>
+          <li><a href="#problem">Problem</a></li>
           <li><a href="#solution">Solution</a></li>
-          <li><a href="#platform">Platform</a></li>
+          <li><a href="#simulation">Simulation</a></li>
+          <li><a href="#platform">Applications</a></li>
           <li><Link to="/designer">Designer</Link></li>
         </ul>
       </nav>
@@ -147,26 +188,21 @@ export default function LandingPage() {
       {/* HERO STATUS */}
       <div className="hero-status">
         <div className="pulse-dot"></div>
-        <span>System Online</span>
+        <span>EDA Engine Online</span>
       </div>
       <div className="scroll-indicator">
         <span>Scroll</span>
         <div className="scroll-line"></div>
       </div>
 
-      {/* THREE JS CANVAS */}
-      <div className="hero-canvas-container">
-        <ThreeScene />
-      </div>
-
       {/* ══ SECTION 01: HERO ═════════════════════════════════════════════ */}
       <section id="hero" className="landing-section" style={{ paddingTop: 0, paddingBottom: 0 }}>
-        <div className="hud-ref tr">REF.01.A / 48.2N — 11.5E</div>
+        <div className="hud-ref tr">REF.01.A / DESIGN SUITE</div>
         <div className="chapter-bg">01</div>
 
         <div className="hero-inner">
           <div className="label reveal reveal-d1">
-            <span className="label-gold">Debye Bio — S26</span>
+            <span className="label-gold">Debye Bio — EDA S26</span>
           </div>
 
           <div className="headline-xl reveal reveal-d2">
@@ -182,12 +218,12 @@ export default function LandingPage() {
 
           <div style={{ display: 'flex', gap: '16px', marginTop: '40px' }} className="reveal reveal-d5">
             <span className="bracket">[EDA FOR BIOELECTRONICS]</span>
-            <span className="bracket">[AI-NATIVE]</span>
             <span className="bracket">[TISSUE-AWARE]</span>
+            <span className="bracket">[SIMULATION-FIRST]</span>
           </div>
 
           <div className="reveal reveal-d6">
-            <Link to="/designer" className="cta">Launch Designer Demo</Link>
+            <Link to="/designer" className="cta">Launch EDA Designer</Link>
           </div>
         </div>
       </section>
@@ -197,7 +233,6 @@ export default function LandingPage() {
       {/* ══ SECTION 02: THE PROBLEM ═══════════════════════════════════════ */}
       <section id="problem" className="landing-section">
         <div className="hud-ref tl">ENV_02 / STATUS: ACTIVE</div>
-        <div className="hud-ref br">REF.02.B</div>
         <div className="chapter-bg">02</div>
 
         <div className="label reveal">02 — The Problem</div>
@@ -216,7 +251,6 @@ export default function LandingPage() {
             <div className="world-item">Which materials the immune system accepts or rejects</div>
             <div className="world-item">What biological noise looks like versus real signal</div>
             <div className="world-item">How cells respond to electrical stimulation over time</div>
-            <div className="world-item">Which proteins and markers to target per disease</div>
           </div>
           <div className="world-divider"></div>
           <div className="world-col">
@@ -225,14 +259,13 @@ export default function LandingPage() {
             <div className="world-item">How electrode geometry affects impedance</div>
             <div className="world-item">How to calculate noise floors mathematically</div>
             <div className="world-item">How to route a design to a fabrication factory</div>
-            <div className="world-item">How to build circuits that have never existed</div>
           </div>
         </div>
 
         <div className="measure-bar reveal">
           <div className="measure-bar-fill"></div>
         </div>
-        <div className="hud-data reveal">Cost per failed iteration — $500K – $2M &nbsp;|&nbsp; Avg cycle — 6–12 weeks &nbsp;|&nbsp; Market — $54B by 2030</div>
+        <div className="hud-data reveal">Cost per failed iteration — $500K – $2M &nbsp;|&nbsp; Avg cycle — 6–12 weeks</div>
       </section>
 
       <hr className="thin" />
@@ -240,7 +273,6 @@ export default function LandingPage() {
       {/* ══ SECTION 03: THE SOLUTION ══════════════════════════════════════ */}
       <section id="solution" className="landing-section">
         <div className="hud-ref tl">ENV_03 / SOLUTION</div>
-        <div className="hud-ref tr">Ø ELECTRODE — TISSUE INTERFACE</div>
         <div className="chapter-bg">03</div>
 
         <div className="wire-diagram">
@@ -254,9 +286,6 @@ export default function LandingPage() {
             <line x1="80" y1="180" x2="240" y2="180" stroke="white" strokeWidth="0.4" opacity="0.4" />
             <line x1="60" y1="210" x2="260" y2="210" stroke="white" strokeWidth="0.4" strokeDasharray="6 3" />
             <line x1="60" y1="240" x2="260" y2="240" stroke="white" strokeWidth="0.4" strokeDasharray="6 3" />
-            <line x1="60" y1="270" x2="260" y2="270" stroke="white" strokeWidth="0.4" strokeDasharray="6 3" />
-            <line x1="60" y1="300" x2="260" y2="300" stroke="white" strokeWidth="0.4" strokeDasharray="6 3" />
-            <line x1="60" y1="330" x2="260" y2="330" stroke="white" strokeWidth="0.4" strokeDasharray="6 3" />
             <text x="200" y="95" fill="white" fontSize="8" fontFamily="monospace" opacity="0.5">ELECTRODE</text>
             <text x="196" y="172" fill="white" fontSize="7" fontFamily="monospace" opacity="0.4">INTERFACE</text>
             <text x="210" y="255" fill="white" fontSize="8" fontFamily="monospace" opacity="0.4">TISSUE</text>
@@ -273,65 +302,179 @@ export default function LandingPage() {
           Debye encodes biological knowledge natively — every tissue model, every electrode material, every noise source. Place an electrode. The tool already knows what tissue it is touching.
         </div>
 
-        <div className="section-rule reveal"></div>
-
         <div className="feature-grid reveal">
           <div className="feature-cell">
             <div className="feature-num">01 / MODULE</div>
             <div className="feature-name">Cell & Tissue Library</div>
-            <div className="feature-desc">Electrical properties of every major tissue pre-loaded. Skin, heart muscle, blood vessel, gut lining, cortex. Pick the target — the tool knows its behaviour.</div>
+            <div className="feature-desc">Electrical properties of every major tissue pre-loaded. Skin, heart muscle, blood vessel, gut lining, cortex.</div>
           </div>
           <div className="feature-cell">
             <div className="feature-num">02 / MODULE</div>
             <div className="feature-name">Electrode Interface Model</div>
-            <div className="feature-desc">Randles circuit + Cole-Cole model. The boundary where metal meets biology, modelled mathematically. Impedance predicted before fabrication.</div>
+            <div className="feature-desc">Randles circuit + Cole-Cole model. The boundary where metal meets biology, modelled mathematically.</div>
           </div>
           <div className="feature-cell">
             <div className="feature-num">03 / MODULE</div>
             <div className="feature-name">Noise Budget Engine</div>
-            <div className="feature-desc">Thermal, 1/f flicker, motion artifact, shot noise, biological background — all five sources quantified. Signal detectability answered before anything is built.</div>
+            <div className="feature-desc">Thermal, 1/f flicker, motion artifact, shot noise, biological background — all five sources quantified.</div>
           </div>
           <div className="feature-cell">
             <div className="feature-num">04 / MODULE</div>
             <div className="feature-name">Design Rule Checker</div>
-            <div className="feature-desc">DRC equivalent for bioelectronics. Biological, electrical, and biocompatibility violations flagged automatically. No manual audit required.</div>
+            <div className="feature-desc">DRC equivalent for bioelectronics. Biological, electrical, and biocompatibility violations flagged automatically.</div>
           </div>
           <div className="feature-cell">
             <div className="feature-num">05 / MODULE</div>
             <div className="feature-name">AI Copilot</div>
-            <div className="feature-desc">Domain-grounded agent. Every response retrieved from a curated biological knowledge base. Cites real papers. Never guesses.</div>
+            <div className="feature-desc">Domain-grounded agent. Every response retrieved from a curated biological knowledge base.</div>
           </div>
           <div className="feature-cell">
             <div className="feature-num">06 / MODULE</div>
             <div className="feature-name">Regulatory Export</div>
-            <div className="feature-desc">ISO 10993 biocompatibility matrix auto-generated. FDA and EU MDR documentation drafted from your design choices. Compliance as a byproduct.</div>
+            <div className="feature-desc">ISO 10993 biocompatibility matrix auto-generated. FDA and EU MDR documentation drafted from your design.</div>
           </div>
         </div>
       </section>
 
       <hr className="thin" />
 
-      {/* ══ SECTION 09: CTA ════════════════════════════════════════════════ */}
+      {/* ══ SECTION 04: SIMULATION PREVIEW ═══════════════════════════════ */}
+      <section id="simulation" className="landing-section">
+        <div className="hud-ref tl">ENV_04 / SIMULATION ENGINE</div>
+        <div className="chapter-bg">04</div>
+
+        <div className="label reveal">04 — Live Simulation</div>
+        <div className="headline-l reveal">
+          Noise budget.<br />Before you <span className="gold">build anything.</span>
+        </div>
+
+        <div className="body-text reveal" style={{ marginTop: '16px' }}>
+          Five noise sources. Quantified individually. Every design, every biological environment.
+        </div>
+
+        <div className="sim-visual reveal" id="sim-visual">
+          <svg className="sim-svg" viewBox="0 0 700 200" preserveAspectRatio="none">
+            <line x1="0" y1="40" x2="700" y2="40" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+            <line x1="0" y1="80" x2="700" y2="80" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+            <line x1="0" y1="120" x2="700" y2="120" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+            <line x1="0" y1="160" x2="700" y2="160" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+            <line x1="280" y1="0" x2="280" y2="200" stroke="rgba(236,208,111,0.2)" strokeWidth="1" strokeDasharray="4 4" />
+            <text x="285" y="15" fill="rgba(236,208,111,0.5)" fontSize="9" fontFamily="monospace">1 kHz</text>
+            <path id="imp-curve"
+              d="M 0,10 C 40,12 80,18 140,35 C 200,52 240,78 280,110 C 320,138 380,158 440,168 C 500,175 580,180 700,184"
+              stroke="white" strokeWidth="1.5" fill="none" strokeDasharray="1200" strokeDashoffset="1200" />
+            <path id="phase-curve"
+              d="M 0,140 C 60,138 100,130 140,108 C 180,86 220,62 280,50 C 340,40 400,38 460,42 C 520,48 600,60 700,70"
+              stroke="rgba(236,208,111,0.5)" strokeWidth="1" fill="none" strokeDasharray="900" strokeDashoffset="900" />
+          </svg>
+        </div>
+
+        <div className="noise-bars" id="noise-bars">
+          <div className="noise-row-outer">
+            <div className="noise-label">Thermal</div>
+            <div className="noise-track"><div className="noise-fill" data-w="45%"></div></div>
+            <div className="noise-val">2.1 µVrms</div>
+          </div>
+          <div className="noise-row-outer">
+            <div className="noise-label">Amplifier 1/f</div>
+            <div className="noise-track"><div className="noise-fill" data-w="35%"></div></div>
+            <div className="noise-val">1.6 µVrms</div>
+          </div>
+          <div className="noise-row-outer">
+            <div className="noise-label">Motion Artifact</div>
+            <div className="noise-track"><div className="noise-fill gold-fill" data-w="26%"></div></div>
+            <div className="noise-val">1.2 µVrms</div>
+          </div>
+        </div>
+      </section>
+
+      <hr className="thin" />
+
+      {/* ══ SECTION 05: DRC ════════════════════════════════════════════════ */}
+      <section id="drc" className="landing-section">
+        <div className="chapter-bg">05</div>
+        <div className="label reveal">05 — Design Rule Check</div>
+        <div className="headline-l reveal">
+          Spell-check for<br />medical devices.<br /><span className="gold">Instant. Automatic.</span>
+        </div>
+
+        <div className="drc-list reveal">
+          <div className="drc-item">
+            <div className="drc-status error"></div>
+            <div className="drc-code">BIO-001</div>
+            <div className="drc-text">
+              <div className="drc-title">Electrode impedance out of range</div>
+              <div className="drc-detail">2.1 MΩ at 1 kHz exceeds optimal range for glucose sensing. Increase area to ≥ 2000 µm².</div>
+            </div>
+          </div>
+          <div className="drc-item">
+            <div className="drc-status pass"></div>
+            <div className="drc-code">PASS</div>
+            <div className="drc-text">
+              <div className="drc-title">8 checks passed</div>
+              <div className="drc-detail">ISO 10993 compliant &nbsp;·&nbsp; Charge density within safe limits &nbsp;·&nbsp; Biocompatibility verified</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr className="thin" />
+
+      {/* ══ SECTION 06: USE CASES ══════════════════════════════════════════ */}
+      <section id="platform" className="landing-section">
+        <div className="chapter-bg">06</div>
+        <div className="label reveal">06 — Applications</div>
+        <div className="headline-l reveal">
+          Every device.<br />One platform.
+        </div>
+
+        <div style={{ marginTop: '8px' }} className="reveal">
+          <div className="usecase-row">
+            <div className="usecase-num">01</div>
+            <div>
+              <div className="usecase-name">Continuous Glucose Monitor</div>
+              <div className="usecase-tag">Metabolic — 14-day wear</div>
+            </div>
+            <div className="usecase-desc">Subcutaneous electrode coated with enzyme layer. Fouling resistance over wear period validated before fabrication.</div>
+          </div>
+          <div className="usecase-row">
+            <div className="usecase-num">02</div>
+            <div>
+              <div className="usecase-name">Cardiac Arrhythmia Patch</div>
+              <div className="usecase-tag">Cardiology — 30-day ECG</div>
+            </div>
+            <div className="usecase-desc">Multi-layer signal propagation through chest tissue modelled. Motion artifact dominant noise source quantified.</div>
+          </div>
+          <div className="usecase-row">
+            <div className="usecase-num">03</div>
+            <div>
+              <div className="usecase-name">Spinal Cord Stimulator</div>
+              <div className="usecase-tag">Chronic Pain — 10-year implant</div>
+            </div>
+            <div className="usecase-desc">Anisotropic white matter conductivity modelled. Volume of tissue activated predicted per parameter set.</div>
+          </div>
+        </div>
+      </section>
+
+      <hr className="thin" />
+
+      {/* ══ SECTION 07: CTA ════════════════════════════════════════════════ */}
       <section id="cta-section" className="landing-section">
-        <div className="chapter-bg" style={{ fontSize: '20vw', right: 'auto', left: '-2vw' }}>09</div>
+        <div className="chapter-bg" style={{ fontSize: '20vw', right: 'auto', left: '-2vw' }}>07</div>
 
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
           <div className="label reveal" style={{ justifyContent: 'center', marginBottom: '24px' }}>
-            <span className="label-gold">Early Access — S26</span>
+            <span className="label-gold">Debye EDA Suite</span>
           </div>
 
           <div className="headline-xl reveal" style={{ margin: '0 auto' }}>
-            Every major medical device<br />of the next 20 years will have<br />electronics touching<br /><span className="gold">biology.</span>
+            The teams building<br />the next 20 years of medtech<br />should not be<br /><span className="gold">designing blind.</span>
           </div>
 
           <div className="section-rule reveal" style={{ margin: '40px auto', maxWidth: '300px' }}></div>
 
-          <div className="body-text reveal" style={{ margin: '0 auto 40px', textAlign: 'center' }}>
-            The teams building those devices should not be designing blind. Debye is what changes that.
-          </div>
-
           <div className="reveal">
-            <Link to="/designer" className="cta">Request Early Access & Try Designer</Link>
+            <Link to="/designer" className="cta">Launch Designer Demo</Link>
           </div>
         </div>
       </section>
@@ -342,10 +485,10 @@ export default function LandingPage() {
         <ul className="footer-links">
           <li><a href="#problem">Problem</a></li>
           <li><a href="#solution">Solution</a></li>
-          <li><a href="#platform">Platform</a></li>
+          <li><a href="#simulation">Simulation</a></li>
           <li><Link to="/designer">Designer</Link></li>
         </ul>
-        <div className="footer-meta">© 2026 Debye Bio &nbsp;·&nbsp; EDA Software for Living Tissue &nbsp;·&nbsp; San Francisco</div>
+        <div className="footer-meta">© 2026 Debye Bio &nbsp;·&nbsp; EDA Software for Living Tissue</div>
       </footer>
     </div>
   );

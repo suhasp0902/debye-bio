@@ -242,20 +242,6 @@
   width: 0; transition: width 1.5s cubic-bezier(0.4,0,0.2,1);
 }
 
-.cornered {
-  position: relative;
-  padding: 24px;
-}
-.cornered::before, .cornered::after,
-.cornered .corner-b::before, .cornered .corner-b::after {
-  content: ''; position: absolute;
-  width: 12px; height: 12px;
-}
-.cornered::before { top: 0; left: 0; border-top: 1px solid rgba(255,255,255,0.3); border-left: 1px solid rgba(255,255,255,0.3); }
-.cornered::after { top: 0; right: 0; border-top: 1px solid rgba(255,255,255,0.3); border-right: 1px solid rgba(255,255,255,0.3); }
-.cornered .corner-b::before { bottom: 0; left: 0; border-bottom: 1px solid rgba(255,255,255,0.3); border-left: 1px solid rgba(255,255,255,0.3); }
-.cornered .corner-b::after { bottom: 0; right: 0; border-bottom: 1px solid rgba(255,255,255,0.3); border-right: 1px solid rgba(255,255,255,0.3); }
-
 /* ─── HERO ─────────────────────────────────────────────────────── */
 #hero {
   justify-content: center;
@@ -358,7 +344,7 @@
   padding: 36px 28px;
   transition: background 0.3s;
 }
-.feature-cell:hover { background: rgba(255,255,255,0.02); }
+.feature-cell:hover { background: rgba(236, 208, 111, 0.05); }
 .feature-num {
   font-size: 9px; letter-spacing: 0.2em;
   text-transform: uppercase; color: rgba(255,255,255,0.2);
@@ -471,84 +457,6 @@
   font-size: 12px; color: rgba(255,255,255,0.35); line-height: 1.7;
 }
 
-/* ─── SECTION: MARKET / WHY NOW ─────────────────────────────────── */
-.stat-row {
-  display: flex; gap: 80px;
-  margin-top: 60px;
-}
-.stat-item { flex: 1; }
-.stat-num {
-  font-size: clamp(40px, 5vw, 68px);
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  color: #ffffff;
-  line-height: 1;
-  margin-bottom: 12px;
-}
-.stat-label-s {
-  font-size: 10px; letter-spacing: 0.2em;
-  text-transform: uppercase; color: rgba(255,255,255,0.3);
-  line-height: 1.6;
-}
-.stat-divider {
-  width: 1px; background: rgba(255,255,255,0.08);
-  align-self: stretch;
-}
-.window-list {
-  margin-top: 48px; max-width: 600px;
-}
-.window-item {
-  display: flex; gap: 24px; padding: 24px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-.window-year {
-  font-size: 10px; letter-spacing: 0.2em;
-  color: #ECD06F; font-family: monospace;
-  width: 50px; flex-shrink: 0; padding-top: 2px;
-}
-.window-text {
-  font-size: 13px; line-height: 1.8;
-  color: rgba(255,255,255,0.45);
-}
-
-/* ─── SECTION: ANALOGY ─────────────────────────────────────────── */
-.analogy-split {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  background: rgba(255,255,255,0.06);
-  margin-top: 48px;
-  max-width: 800px;
-}
-.analogy-col {
-  background: #000000;
-  padding: 40px 36px;
-}
-.analogy-era {
-  font-size: 10px; letter-spacing: 0.25em;
-  text-transform: uppercase; color: rgba(255,255,255,0.3);
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-.analogy-line {
-  font-size: 13px; line-height: 1.9;
-  color: rgba(255,255,255,0.45);
-  padding: 4px 0;
-  display: flex; gap: 12px;
-}
-.analogy-line .arr { color: rgba(255,255,255,0.2); flex-shrink: 0; }
-.analogy-highlight {
-  color: #ECD06F;
-}
-
-/* ─── SECTION: FINAL CTA ─────────────────────────────────────────── */
-#cta-section {
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
 /* ─── FOOTER ─────────────────────────────────────────────────────── */
 .landing-footer {
   border-top: 1px solid rgba(255,255,255,0.08);
@@ -589,13 +497,4 @@ hr.thin {
   border: none;
   border-top: 1px solid rgba(255,255,255,0.06);
   margin: 0;
-}
-
-/* ─── THREE JS CANVAS ─────────────────────────────────────────────── */
-.hero-canvas-container {
-  position: absolute;
-  top: 0; right: 0;
-  width: 50%; height: 100%;
-  pointer-events: none;
-  z-index: 1;
 }
