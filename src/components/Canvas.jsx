@@ -1,21 +1,24 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { ReactFlow, Controls, Background, MiniMap, applyNodeChanges, applyEdgeChanges, addEdge, Panel } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
 import BiologyNode from './nodes/BiologyNode';
 import ElectronicsNode from './nodes/ElectronicsNode';
 import MaterialNode from './nodes/MaterialNode';
+import BiochemistryNode from './nodes/BiochemistryNode';
 
 const nodeTypes = {
   biology: BiologyNode,
   electronics: ElectronicsNode,
   material: MaterialNode,
+  biochemistry: BiochemistryNode,
 };
 
 const NODE_COLORS = {
   biology: '#22D3EE',
   electronics: '#6366F1',
-  material: '#A78BFA',
+  material: '#F59E0B',
+  biochemistry: '#10B981',
 };
 
 export default function Canvas({ 
@@ -31,6 +34,18 @@ export default function Canvas({
   onConnect: onConnectParent
 }) {
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
+
+  // Handle custom node deletion event
+  useEffect(() => {
+    const handleDeleteNode = (e) => {
+      const { id } = e.detail;
+      setNodes((nds) => nds.filter((node) => node.id !== id));
+      setEdges((eds) => eds.filter((edge) => edge.source !== id && edge.target !== id));
+    };
+
+    window.addEventListener('debye-delete-node', handleDeleteNode);
+    return () => window.removeEventListener('debye-delete-node', handleDeleteNode);
+  }, [setNodes, setEdges]);
 
   const onNodesChange = useCallback(
     (changes) => {
@@ -60,6 +75,11 @@ export default function Canvas({
     },
     [setEdges, onConnectParent]
   );
+
+  const onEdgeClick = useCallback((_, edge) => {
+    // Edge is now selected, standard delete key will remove it
+    console.log('Edge selected:', edge.id);
+  }, []);
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -116,8 +136,10 @@ export default function Canvas({
         onNodeClick={onNodeClick}
         onNodeContextMenu={onNodeContextMenu}
         onPaneClick={onPaneClick}
+        onEdgeClick={onEdgeClick}
         fitView
         connectionRadius={40}
+        connectionMode="loose"
         deleteKeyCode="Delete"
         proOptions={{ hideAttribution: true }}
         className="debye-canvas"

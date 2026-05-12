@@ -129,6 +129,7 @@ export default function Topbar({ scenario, setScenario, onSimulate, onRunDRC, on
              <span>V1.2.0</span>
           </div>
         </div>
+        </div>
       </div>
 
       {/* Toolbar (Quick Actions) */}

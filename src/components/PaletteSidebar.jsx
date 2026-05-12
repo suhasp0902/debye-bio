@@ -82,17 +82,36 @@ const PALETTE_ITEMS = [
     ]
   },
   {
+    category: 'Neuro-Modulation',
+    icon: <Zap className="w-4 h-4 text-orange-400" />,
+    color: 'text-orange-400',
+    items: [
+      { id: 'neu_dbs',     label: 'DBS Probe (Chronic)',   type: 'electronics', role: 'Neural',     info: 'Medtronic-spec' },
+      { id: 'neu_opt',     label: 'Optogenetic LED',      type: 'electronics', role: 'Neural',     info: '470nm Blue' },
+      { id: 'neu_vagus',   label: 'Vagus Nerve Cuff',      type: 'electronics', role: 'Neural',     info: 'Symmetry' },
+    ]
+  },
+  {
+    category: 'Microfluidics',
+    icon: <Activity className="w-4 h-4 text-blue-400" />,
+    color: 'text-blue-400',
+    items: [
+      { id: 'mf_pump',     label: 'Piezo Micro-Pump',      type: 'electronics', role: 'Fluidics',   info: '50 µL/min' },
+      { id: 'mf_valve',    label: 'Micro-Valve',           type: 'electronics', role: 'Fluidics',   info: 'Normally Closed' },
+      { id: 'mf_sensor',   label: 'Flow Rate Sensor',      type: 'electronics', role: 'Fluidics',   info: 'Thermal' },
+    ]
+  },
+  {
     category: 'Biochemistry',
     icon: <FlaskConical className="w-4 h-4 text-emerald-400" />,
     color: 'text-emerald-400',
     items: [
-      { id: 'bio_glucose',  label: 'Glucose Oxidase Layer', type: 'biology',    role: 'Enzyme',     info: 'GOx' },
-      { id: 'bio_antibody', label: 'Antibody Capture Layer',type: 'biology',    role: 'Immunosensor',info: 'IgG' },
-      { id: 'bio_aptamer',  label: 'Aptamer Layer',         type: 'biology',    role: 'Biosensor',  info: 'DNA/RNA' },
-      { id: 'bio_nafilm',   label: 'Nafion Membrane',       type: 'material',   role: 'Membrane',   info: 'Selectivity' },
-      { id: 'bio_redox',    label: 'Redox Mediator',        type: 'material',   role: 'Mediator',   info: 'Fc/MB' },
-      { id: 'bio_pbs',      label: 'Phosphate Buffer',      type: 'biology',    role: 'Electrolyte',info: 'PBS 7.4' },
-      { id: 'bio_plasma',   label: 'Blood Plasma',          type: 'biology',    role: 'Fluid',      info: '~pH 7.4' },
+      { id: 'bio_glucose',  label: 'Glucose Oxidase Layer', type: 'biochemistry', role: 'Enzyme',     info: 'GOx' },
+      { id: 'bio_antibody', label: 'Antibody Capture Layer',type: 'biochemistry', role: 'Immunosensor',info: 'IgG' },
+      { id: 'bio_aptamer',  label: 'Aptamer Layer',         type: 'biochemistry', role: 'Biosensor',  info: 'DNA/RNA' },
+      { id: 'bio_nafilm',   label: 'Nafion Membrane',       type: 'biochemistry', role: 'Membrane',   info: 'Selectivity' },
+      { id: 'bio_redox',    label: 'Redox Mediator',        type: 'biochemistry', role: 'Mediator',   info: 'Fc/MB' },
+      { id: 'bio_plasma',   label: 'Blood Plasma',          type: 'biochemistry', role: 'Fluid',      info: '~pH 7.4' },
     ]
   }
 ];

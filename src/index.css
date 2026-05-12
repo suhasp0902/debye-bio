@@ -88,6 +88,20 @@
   background: #4a4a5a;
 }
 
+.glass-node {
+  @apply backdrop-blur-xl bg-opacity-10 border-opacity-30;
+  box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.4);
+}
+
+.glass-node-selected {
+  @apply border-opacity-100 ring-2 ring-accent-primary ring-opacity-40;
+}
+
+.node-handle {
+  @apply !w-2 !h-2 !bg-accent-primary !border !border-white/50 !shadow-sm;
+  border-radius: 50%;
+}
+
 /* Animations */
 @keyframes pulse-soft {
   0%, 100% { opacity: 1; transform: scale(1); }

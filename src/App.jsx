@@ -4,6 +4,7 @@ import PaletteSidebar from './components/PaletteSidebar';
 import Canvas from './components/Canvas';
 import CopilotPanel from './components/CopilotPanel';
 import BottomPanel from './components/BottomPanel';
+import PropertiesPanel from './components/PropertiesPanel';
 import Toast from './components/Toast';
 import AiPromptModal from './components/AiPromptModal';
 import { SCENARIOS } from './data/scenarios';
@@ -315,7 +316,7 @@ export default function App() {
       <div className="flex-1 flex min-h-0 relative">
         <PaletteSidebar />
         
-        <div className="flex-1 flex flex-col relative min-w-0">
+        <div className="flex-1 flex flex-col relative min-w-0 border-r border-border">
             <Canvas 
               scenarioId={scenarioId}
               nodes={nodes}
@@ -323,10 +324,7 @@ export default function App() {
               edges={edges}
               setEdges={setEdges}
               showGrid={showGrid}
-              setSelectedNode={(node) => {
-                setSelectedNode(node);
-                if (node) setActiveTab('properties');
-              }}
+              setSelectedNode={setSelectedNode}
               onContextMenuExplain={(msg) => setExternalMessage(msg)}
               onNodesChangeParent={(changes) => {
                 handleNodesChangeParent(changes);
@@ -350,6 +348,11 @@ export default function App() {
             nodes={nodes}
           />
         </div>
+
+        <PropertiesPanel 
+          selectedNode={selectedNode}
+          onUpdateNode={handleUpdateNode}
+        />
 
         <CopilotPanel 
           designContext={{ scenarioId, nodes, edges, drcResults, simulationData }}

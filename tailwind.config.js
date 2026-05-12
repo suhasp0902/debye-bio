@@ -35,6 +35,8 @@ export default {
           elecBorder: '#6366F1',
           material: '#2D1B00',
           materialBorder: '#F59E0B',
+          biochem: '#064E3B',
+          biochemBorder: '#10B981',
         }
       },
       fontFamily: {
