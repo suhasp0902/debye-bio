@@ -35,16 +35,8 @@ func MethodGuard(w http.ResponseWriter, r *http.Request, method string) bool {
 }
 
 func AuthGuard(w http.ResponseWriter, r *http.Request) bool {
-	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" {
-		WriteError(w, http.StatusUnauthorized, "Authentication required")
-		return false
-	}
-	if !strings.HasPrefix(authHeader, "Bearer ") {
-		WriteError(w, http.StatusUnauthorized, "Invalid authentication format")
-		return false
-	}
-	// In production, verify the JWT with Supabase's public key here.
+	// Authentication has been removed. 
+	// In a future version, implement a new auth system if needed.
 	return true
 }
 

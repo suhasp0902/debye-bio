@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"debye-bio/internal/debye"
+	"debye-bio/pkg/debye"
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {

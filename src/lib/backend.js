@@ -1,16 +1,11 @@
 import { runSimulation as runLocalSimulation } from './simulation';
 import { runDRC as runLocalDRC } from './drc';
-import { supabase } from './supabase';
 
 async function callApi(path, payload, options = {}) {
-  const { data: { session } } = await supabase.auth.getSession();
-  const token = session?.access_token;
-
   const response = await fetch(path, {
     method: options.method || 'POST',
     headers: { 
-      'Content-Type': 'application/json',
-      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      'Content-Type': 'application/json'
     },
     body: options.method === 'GET' ? undefined : JSON.stringify(payload || {}),
   });
