@@ -34,6 +34,28 @@ RULES:
 4. Never invent specific numeric values — if you're unsure, say so.
 5. Format responses in plain text (no markdown headers or code blocks).`;
 
+const fetchWithRetry = async (url, options, maxRetries = 3, initialDelay = 1000) => {
+  let retries = 0;
+  while (retries < maxRetries) {
+    try {
+      const response = await fetch(url, options);
+      if (response.status === 429) {
+        const delay = initialDelay * Math.pow(2, retries);
+        console.warn(`Gemini rate limit hit (429). Retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        retries++;
+        continue;
+      }
+      return response;
+    } catch (error) {
+      if (retries === maxRetries - 1) throw error;
+      const delay = initialDelay * Math.pow(2, retries);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      retries++;
+    }
+  }
+};
+
 export async function askCopilot(message, designContext, conversationHistory = []) {
   if (!GEMINI_API_KEY) {
     return 'Gemini API key not configured. Please set VITE_GEMINI_API_KEY in your environment.';
@@ -78,7 +100,7 @@ export async function askCopilot(message, designContext, conversationHistory = [
   });
 
   try {
-    const response = await fetch(
+    const response = await fetchWithRetry(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: 'POST',
@@ -97,6 +119,9 @@ export async function askCopilot(message, designContext, conversationHistory = [
     if (!response.ok) {
       const errText = await response.text();
       console.error('Gemini API error:', response.status, errText);
+      if (response.status === 429) {
+        return "I'm receiving too many requests right now. Please wait a moment and try again.";
+      }
       return `AI service error (${response.status}). Please check your API key configuration.`;
     }
 

@@ -21,12 +21,12 @@ const nodeTypes = {
 };
 
 const NODE_COLORS = {
-  biology: '#22D3EE',
-  electronics: '#A78BFA',
-  material: '#E879F9',
+  biology: '#14B8A6',
+  electronics: '#6366F1',
+  material: '#FBBF24',
   biochemistry: '#10B981',
-  electrode: '#6366F1',
-  neuromodulation: '#FB923C',
+  electrode: '#06B6D4',
+  neuromodulation: '#7F1D1D',
   microfluidics: '#3B82F6',
 };
 
