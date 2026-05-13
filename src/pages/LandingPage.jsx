@@ -185,19 +185,9 @@ export default function LandingPage() {
         </ul>
       </nav>
 
-      {/* HERO STATUS */}
-      <div className="hero-status">
-        <div className="pulse-dot"></div>
-        <span>Engine Online</span>
-      </div>
-      <div className="scroll-indicator">
-        <span>Scroll</span>
-        <div className="scroll-line"></div>
-      </div>
 
       {/* ══ SECTION 01: HERO ═════════════════════════════════════════════ */}
       <section id="hero" className="landing-section" style={{ paddingTop: 0, paddingBottom: 0 }}>
-        <div className="hud-ref tr">REF.01.A / DESIGN SUITE</div>
         <div className="chapter-bg">01</div>
 
         <div className="hero-inner">
@@ -232,7 +222,6 @@ export default function LandingPage() {
 
       {/* ══ SECTION 02: THE PROBLEM ═══════════════════════════════════════ */}
       <section id="problem" className="landing-section">
-        <div className="hud-ref tl">ENV_02 / STATUS: ACTIVE</div>
         <div className="chapter-bg">02</div>
 
         <div className="label reveal">02 — The Problem</div>
@@ -272,7 +261,6 @@ export default function LandingPage() {
 
       {/* ══ SECTION 03: THE SOLUTION ══════════════════════════════════════ */}
       <section id="solution" className="landing-section">
-        <div className="hud-ref tl">ENV_03 / SOLUTION</div>
         <div className="chapter-bg">03</div>
 
         <div className="wire-diagram">
