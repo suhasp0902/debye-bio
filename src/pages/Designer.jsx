@@ -10,7 +10,7 @@ import AiPromptModal from '../components/AiPromptModal';
 import { SCENARIOS } from '../data/scenarios';
 import { simulateDesign, runDesignRules, generateDesignBackend } from '../lib/backend';
 
-export default function Designer() {
+export default function Designer({ onSignOut }) {
   const [scenarioId, setScenarioId] = useState(null); // null means blank canvas
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
@@ -364,7 +364,7 @@ export default function Designer() {
         showGrid={showGrid}
         setShowGrid={setShowGrid}
         hasUnsavedChanges={hasUnsavedChanges}
-        nodeCount={nodes.length}
+        nodeCount={nodes.length} onSignOut={onSignOut}
       />
       
       <div className="flex-1 flex min-h-0 relative">

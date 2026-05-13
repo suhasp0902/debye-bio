@@ -1,7 +1,7 @@
 import { Play, Shield, Download, File, FolderOpen, Save, Settings, Grid, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
 import { useReactFlow } from '@xyflow/react';
 
-export default function Topbar({ scenario, setScenario, onSimulate, onRunDRC, onExport, onNewProject, onSaveProject, onOpenProject, onClearCanvas, showGrid, setShowGrid, hasUnsavedChanges, nodeCount }) {
+export default function Topbar({ scenario, setScenario, onSimulate, onRunDRC, onExport, onNewProject, onSaveProject, onOpenProject, onClearCanvas, showGrid, setShowGrid, hasUnsavedChanges, nodeCount, onSignOut }) {
   const { zoomIn, zoomOut, fitView } = useReactFlow();
   
   return (
@@ -170,6 +170,9 @@ export default function Topbar({ scenario, setScenario, onSimulate, onRunDRC, on
         </button>
 
         <div className="ml-auto flex items-center gap-2">
+          <button onClick={onSignOut} className="px-3 py-1 text-accent-error hover:bg-accent-error/10 border border-transparent hover:border-accent-error/20 rounded text-[11px] font-bold uppercase tracking-wider transition-all">
+            Sign Out
+          </button>
           <button className="p-1.5 text-text-muted hover:text-text-primary hover:bg-surface-raised rounded tooltip-trigger" title="Settings">
             <Settings className="w-4 h-4" />
           </button>
