@@ -1,7 +1,7 @@
 import { Handle, Position, NodeResizer } from '@xyflow/react';
 import { X } from 'lucide-react';
 
-export default function BaseNode({ id, data, selected, children, type, color, border }) {
+export default function BaseNode({ id, data, selected, children, type, color }) {
   return (
     <div className={`glass-node bg-opacity-10 border rounded-[12px] min-w-[160px] min-h-[90px] overflow-visible shadow-2xl transition-all duration-300 ${selected ? 'glass-node-selected' : 'border-opacity-30'} group relative`} style={{ backgroundColor: `${color}15`, borderColor: selected ? color : `${color}40` }}>
       <NodeResizer 

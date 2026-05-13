@@ -9,10 +9,44 @@ import { TISSUES, MATERIALS } from '../data/bioData';
 // Boltzmann constant * room temp (310K body temp)
 const kT = 1.38e-23 * 310; // J
 
+const paletteTissueMap = {
+  'bio_subq': 'subcutaneous',
+  'bio_cardiac': 'cardiac',
+  'bio_cortex': 'cortical',
+  'bio_white': 'white_matter',
+  'bio_blood': 'blood',
+  'bio_skin': 'skin_epidermis',
+  'bio_nerve': 'peripheral_nerve',
+  'bio_gastric': 'gastric',
+  'bio_wound_a': 'wound',
+  'bio_wound_c': 'wound_chronic',
+  'bio_retina': 'retina',
+  'bio_liver': 'liver',
+  'bio_bone': 'bone',
+  'bio_csf': 'csf',
+  'bio_fat': 'fat',
+};
+
+const paletteMaterialMap = {
+  'mat_pt': 'platinum',
+  'mat_ptir': 'platinum_iridium',
+  'mat_au': 'gold',
+  'mat_irox': 'iridium_oxide',
+  'mat_tin': 'titanium_nitride',
+  'mat_pedot': 'pedot',
+  'mat_cnt': 'carbon_nanotube',
+  'mat_graphene': 'graphene',
+  'mat_parylene': 'parylene_c',
+  'mat_ti': 'titanium',
+};
+
 /**
- * Resolve tissue key from node label
+ * Resolve tissue key from node label or itemId
  */
-function resolveTissue(label) {
+function resolveTissue(label, itemId) {
+  if (itemId && paletteTissueMap[itemId]) {
+    return { key: paletteTissueMap[itemId], ...TISSUES[paletteTissueMap[itemId]] };
+  }
   if (!label) return null;
   const l = label.toLowerCase();
   for (const [key, tissue] of Object.entries(TISSUES)) {
@@ -38,9 +72,12 @@ function resolveTissue(label) {
 }
 
 /**
- * Resolve material key from node label/data
+ * Resolve material key from node label/data or itemId
  */
-function resolveMaterial(label) {
+function resolveMaterial(label, itemId) {
+  if (itemId && paletteMaterialMap[itemId]) {
+    return { key: paletteMaterialMap[itemId], ...MATERIALS[paletteMaterialMap[itemId]] };
+  }
   if (!label) return null;
   const l = label.toLowerCase();
   for (const [key, mat] of Object.entries(MATERIALS)) {
@@ -106,7 +143,6 @@ function randlesImpedance(freq, rSolution, rCt, cDl) {
  * Compute electrode circuit parameters from material + area
  */
 function electrodeParams(material, area_um2) {
-  const area_cm2 = area_um2 * 1e-8;
   // Base impedance values scaled by material factor and area
   const rSolution = 500 * (1000 / area_um2); // Scales inversely with area
   const rCt = (2e6 * material.eis_factor) / (area_um2 / 1000);
@@ -127,7 +163,7 @@ function formatImpedance(ohms) {
 /**
  * Main simulation runner — reads actual canvas nodes
  */
-export function runSimulation(nodes, scenarioId) {
+export function runSimulation(nodes) {
   // ---- Extract design parameters from canvas nodes ----
   let tissue = null;
   let material = null;
@@ -139,20 +175,21 @@ export function runSimulation(nodes, scenarioId) {
   for (const node of nodes) {
     const d = node.data || {};
     const label = d.label || '';
+    const itemId = d.item_id;
 
     // Find tissue
     if (node.type === 'biology' || d.type === 'tissue') {
-      const t = resolveTissue(label);
+      const t = resolveTissue(label, itemId);
       if (t) tissue = t;
     }
 
     // Find electrode material
     if (node.type === 'material' || node.type === 'electronics') {
-      const m = resolveMaterial(label);
+      const m = resolveMaterial(label, itemId);
       if (m) material = m;
       if (d.area) electrodeArea = Number(d.area);
       if (d.material) {
-        const mm = resolveMaterial(d.material);
+        const mm = resolveMaterial(d.material, null);
         if (mm) material = mm;
       }
     }
@@ -207,7 +244,8 @@ export function runSimulation(nodes, scenarioId) {
   const bandwidth = 10000; // 10 kHz measurement bandwidth
   const thermalNoise = Math.sqrt(4 * kT * (rCt + rSolution) * bandwidth) * 1e6; // µV
   const amplifierNoise = hasAmplifier ? 0.8 : 1.6; // Good amplifier reduces noise
-  const motionNoise = tissue.key === 'skin_epidermis' ? 3.0 : tissue.key === 'cardiac' ? 2.5 : 1.2;
+  const motionNoiseBase = tissue.key === 'skin_epidermis' ? 3.0 : tissue.key === 'cardiac' ? 2.5 : 1.2;
+  const motionNoise = hasFilter ? motionNoiseBase * 0.5 : motionNoiseBase;
   const biologicalNoise = tissue.noise_uV;
   const shotNoise = 0.3;
 
@@ -244,5 +282,15 @@ export function runSimulation(nodes, scenarioId) {
     tissue: tissue.name,
     material: material.name,
     electrodeArea,
+    physicsParams: {
+      r0: tissue.r0,
+      r_inf: tissue.r_inf,
+      tau: tissue.tau,
+      cole_alpha: tissue.cole_alpha,
+      rSolution: rSolution.toFixed(0),
+      rCt: rCt.toExponential(2),
+      cDl: cDl.toExponential(2)
+    },
+    hasMCU
   };
 }

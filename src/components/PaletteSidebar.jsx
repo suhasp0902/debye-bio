@@ -126,9 +126,10 @@ export default function PaletteSidebar() {
     );
   };
 
-  const onDragStart = (event, nodeType, label) => {
+  const onDragStart = (event, nodeType, label, itemId) => {
     event.dataTransfer.setData('application/reactflow', nodeType);
     event.dataTransfer.setData('application/label', label);
+    event.dataTransfer.setData('application/item_id', itemId);
     event.dataTransfer.effectAllowed = 'move';
   };
 
@@ -197,7 +198,7 @@ export default function PaletteSidebar() {
                     <div
                       key={item.id}
                       draggable
-                      onDragStart={(e) => onDragStart(e, item.type, item.label)}
+                      onDragStart={(e) => onDragStart(e, item.type, item.label, item.id)}
                       className="group flex items-center justify-between px-3 py-1.5 mx-1 rounded cursor-grab active:cursor-grabbing hover:bg-surface-raised border border-transparent hover:border-border/50 transition-all"
                     >
                       <div className="min-w-0">

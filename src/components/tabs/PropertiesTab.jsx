@@ -1,16 +1,4 @@
-import { useState, useEffect } from 'react';
-
 export default function PropertiesTab({ selectedNode, onUpdateNode }) {
-  const [formData, setFormData] = useState({});
-
-  useEffect(() => {
-    if (selectedNode) {
-      setFormData({ ...selectedNode.data });
-    } else {
-      setFormData({});
-    }
-  }, [selectedNode]);
-
   if (!selectedNode) {
     return (
       <div className="h-full flex items-center justify-center text-text-muted bg-surface relative z-10">
@@ -19,16 +7,13 @@ export default function PropertiesTab({ selectedNode, onUpdateNode }) {
     );
   }
 
+  const formData = selectedNode.data || {};
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: isNaN(Number(value)) || value === '' ? value : Number(value)
-    }));
-  };
-
-  const handleUpdate = () => {
-    onUpdateNode(selectedNode.id, formData);
+    onUpdateNode(selectedNode.id, {
+      [name]: Number.isNaN(Number(value)) || value === '' ? value : Number(value),
+    });
   };
 
   return (
@@ -39,11 +24,11 @@ export default function PropertiesTab({ selectedNode, onUpdateNode }) {
       <div className="grid grid-cols-2 gap-x-6 gap-y-3 mb-6">
         {Object.entries(formData).map(([key, value]) => {
           if (['label', 'type', 'role', 'status'].includes(key)) return null;
-          
+
           return (
             <div key={key} className="flex flex-col gap-1">
               <label className="text-xs text-text-muted capitalize">{key}:</label>
-              <input 
+              <input
                 type={typeof value === 'number' ? 'number' : 'text'}
                 name={key}
                 value={value}
@@ -59,27 +44,12 @@ export default function PropertiesTab({ selectedNode, onUpdateNode }) {
         <div className="text-xs font-bold text-text-primary mb-2">Computed Properties:</div>
         <div className="grid grid-cols-[1fr_auto] gap-2 text-sm font-mono">
           <div className="text-text-secondary">Impedance @ 1kHz:</div>
-          <div className="text-accent-warning text-right">{selectedNode.data.impedance || '2.1'} MΩ ⚠</div>
+          <div className="text-accent-warning text-right">{selectedNode.data.impedance || 'Run sim'} </div>
           <div className="text-text-secondary">Charge Inj. Limit:</div>
-          <div className="text-text-primary text-right">0.15 mC/cm²</div>
+          <div className="text-text-primary text-right">{selectedNode.data.cil || 'From material'} mC/cm2</div>
           <div className="text-text-secondary">ISO 10993:</div>
-          <div className="text-accent-success text-right">✓ Compliant</div>
+          <div className="text-accent-success text-right">{selectedNode.data.iso === false ? 'Not approved' : 'Compliant/unknown'}</div>
         </div>
-      </div>
-
-      <div className="flex gap-3 mt-auto pt-4">
-        <button 
-          onClick={handleUpdate}
-          className="flex-1 bg-accent-primary hover:bg-accent-primary/90 text-white text-sm font-bold py-2 rounded-md transition-colors"
-        >
-          Update Node
-        </button>
-        <button 
-          onClick={() => setFormData({ ...selectedNode.data })}
-          className="flex-1 border border-border hover:bg-surface-raised text-text-primary text-sm font-bold py-2 rounded-md transition-colors"
-        >
-          Reset
-        </button>
       </div>
     </div>
   );

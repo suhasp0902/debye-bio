@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Bot, Send, Sparkles, AlertTriangle, Info, Lightbulb } from 'lucide-react';
 import { askCopilot } from '../lib/copilot';
 
@@ -8,26 +8,9 @@ export default function CopilotPanel({ designContext, onApplySuggestion, externa
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [suggestions, setSuggestions] = useState([]);
   const messagesEndRef = useRef(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, loading]);
-
-  useEffect(() => {
-    if (externalMessage) {
-      handleSend(externalMessage);
-      onExternalMessageProcessed();
-    }
-  }, [externalMessage]);
-
-  useEffect(() => {
-    // Generate dynamic suggestions based on DRC results and canvas state
+  const suggestions = (() => {
     const newSuggestions = [];
     if (designContext?.drcResults?.errors?.length > 0) {
       designContext.drcResults.errors.forEach(err => {
@@ -35,47 +18,61 @@ export default function CopilotPanel({ designContext, onApplySuggestion, externa
           id: err.id,
           type: 'warning',
           text: err.message,
-          fixable: err.fixable
+          fixable: err.fixable,
         });
       });
     } else if (designContext?.nodes?.length === 0) {
-       newSuggestions.push({
-         id: 'empty-1',
-         type: 'lightbulb',
-         text: 'Start by dragging a Biological Tissue from the Palette, then connect an Electrode.',
-         fixable: false
-       });
+      newSuggestions.push({
+        id: 'empty-1',
+        type: 'lightbulb',
+        text: 'Start by dragging a Biological Tissue from the Palette, then connect an Electrode.',
+        fixable: false,
+      });
     } else {
-       newSuggestions.push({
-         id: 'tip-1',
-         type: 'info',
-         text: 'Design looks good so far. Try running a Mixed-Signal Simulation to verify performance.',
-         fixable: false
-       });
+      newSuggestions.push({
+        id: 'tip-1',
+        type: 'info',
+        text: 'Run a mixed-signal simulation to verify impedance, noise, and SNR against the selected tissue model.',
+        fixable: false,
+      });
     }
-    setSuggestions(newSuggestions);
-  }, [designContext?.drcResults, designContext?.nodes?.length]);
+    return newSuggestions;
+  })();
 
-  const handleSend = async (text) => {
+  const handleSend = useCallback(async (text) => {
     if (!text.trim()) return;
-    
+
     const newMsg = { role: 'user', content: text };
-    setMessages(prev => [...prev, newMsg]);
+    const history = [...messages, newMsg];
+    setMessages(history);
     setInput('');
     setLoading(true);
 
     try {
       const response = await askCopilot(text, designContext, messages);
       setMessages(prev => [...prev, { role: 'assistant', content: response }]);
-    } catch (err) {
-      setMessages(prev => [...prev, { role: 'assistant', content: "Error connecting to AI service." }]);
+    } catch {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Error connecting to AI service.' }]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [designContext, messages]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, loading]);
+
+  useEffect(() => {
+    if (externalMessage) {
+      setTimeout(() => {
+        handleSend(externalMessage);
+        onExternalMessageProcessed();
+      }, 0);
+    }
+  }, [externalMessage, handleSend, onExternalMessageProcessed]);
 
   const renderIcon = (type) => {
-    switch(type) {
+    switch (type) {
       case 'warning': return <AlertTriangle className="w-4 h-4 text-accent-warning" />;
       case 'lightbulb': return <Lightbulb className="w-4 h-4 text-accent-secondary" />;
       case 'info': return <Info className="w-4 h-4 text-accent-primary" />;
@@ -91,10 +88,10 @@ export default function CopilotPanel({ designContext, onApplySuggestion, externa
         </div>
         <div>
           <div className="text-text-primary text-sm font-bold">Debye Copilot</div>
-          <div className="text-text-muted text-[10px]">Grounded in biological literature</div>
+          <div className="text-text-muted text-[10px]">Server-grounded biological literature</div>
         </div>
       </div>
-      
+
       {suggestions.length > 0 && (
         <div className="max-h-[200px] border-b border-border p-3 overflow-y-auto custom-scrollbar bg-surface-raised shrink-0">
           <div className="text-[10px] text-text-muted font-bold uppercase tracking-wider mb-2">Context Suggestions</div>
@@ -123,21 +120,21 @@ export default function CopilotPanel({ designContext, onApplySuggestion, externa
 
       <div className="flex-1 overflow-y-auto p-4 custom-scrollbar flex flex-col gap-4">
         {messages.map((msg, idx) => (
-          <div key={idx} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+          <div key={`${msg.role}-${idx}`} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
             {msg.role === 'assistant' && <div className="text-text-muted text-[10px] mb-1 ml-1 font-bold">Debye Copilot</div>}
             <div className={`p-3 rounded-lg max-w-[90%] text-[13px] leading-relaxed shadow-sm whitespace-pre-wrap ${msg.role === 'user' ? 'bg-accent-primary text-white rounded-br-none' : 'bg-surface-raised border border-border text-text-secondary rounded-bl-none'}`}>
               {msg.content}
             </div>
           </div>
         ))}
-        
+
         {loading && (
           <div className="flex flex-col items-start">
             <div className="text-text-muted text-[10px] mb-1 ml-1 font-bold">Debye Copilot</div>
             <div className="p-3 rounded-lg bg-surface-raised border border-border rounded-bl-none flex gap-1">
-              <div className="w-1.5 h-1.5 bg-accent-primary rounded-full animate-bounce"></div>
-              <div className="w-1.5 h-1.5 bg-accent-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-              <div className="w-1.5 h-1.5 bg-accent-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              <div className="w-1.5 h-1.5 bg-accent-primary rounded-full animate-bounce" />
+              <div className="w-1.5 h-1.5 bg-accent-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+              <div className="w-1.5 h-1.5 bg-accent-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
             </div>
           </div>
         )}
@@ -146,15 +143,15 @@ export default function CopilotPanel({ designContext, onApplySuggestion, externa
 
       <div className="p-3 border-t border-border bg-surface shrink-0">
         <div className="relative">
-          <input 
-            type="text" 
+          <input
+            type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend(input)}
             placeholder="Ask anything about this design..."
             className="w-full bg-surface-raised border border-border text-text-primary text-sm rounded-md pl-3 pr-10 py-2.5 focus:outline-none focus:border-accent-primary"
           />
-          <button 
+          <button
             onClick={() => handleSend(input)}
             disabled={!input.trim() || loading}
             className="absolute right-2 top-2 text-accent-primary hover:text-accent-primary/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"

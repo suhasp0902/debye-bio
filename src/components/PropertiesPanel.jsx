@@ -1,4 +1,4 @@
-import { Settings, Info, Zap, Activity, Layers } from 'lucide-react';
+import { Settings, Info, Zap, Layers } from 'lucide-react';
 
 export default function PropertiesPanel({ selectedNode, onUpdateNode }) {
   if (!selectedNode) {

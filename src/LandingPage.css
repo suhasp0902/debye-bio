@@ -88,10 +88,10 @@
 /* ─── SECTION BASE ─────────────────────────────────────────────── */
 .landing-section {
   position: relative;
-  min-height: 100vh;
+  min-height: auto; /* Removed 100vh to eliminate endless scrolling voids */
   display: flex; flex-direction: column;
-  justify-content: center;
-  padding: 80px 48px;
+  justify-content: flex-start;
+  padding: 120px 48px;
   overflow: hidden;
 }
 
@@ -236,6 +236,7 @@
   justify-content: center;
   align-items: flex-start;
   min-height: 100vh;
+  min-height: 100dvh; /* Android/Mobile compliant height */
   padding: 0 48px;
 }
 .hero-inner {
@@ -274,7 +275,7 @@
   display: grid;
   grid-template-columns: 1fr 1px 1fr;
   gap: 0 60px;
-  margin-top: 60px;
+  margin-top: 48px;
   max-width: 1000px;
 }
 .world-col { padding-bottom: 32px; }
@@ -309,7 +310,7 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 1px;
   background: rgba(255,255,255,0.06);
-  margin-top: 60px;
+  margin-top: 48px;
   max-width: 1000px;
 }
 .feature-cell {
@@ -484,8 +485,9 @@ hr.thin {
   .nav-links { display: none; } /* Simplified for demo, usually a menu toggle */
 
   .landing-section {
-    padding: 40px 24px;
+    padding: 60px 24px; /* Slightly increased for better rhythm on mobile */
     min-height: auto;
+    justify-content: flex-start;
   }
 
   .chapter-bg {
@@ -497,8 +499,9 @@ hr.thin {
   .hud-ref { display: none; } /* Hide technical refs on mobile for space */
 
   .headline-xl {
-    font-size: 42px;
+    font-size: clamp(32px, 10vw, 48px); /* More responsive sizing */
     line-height: 1.1;
+    letter-spacing: -0.02em;
   }
   .headline-l {
     font-size: 32px;
@@ -506,9 +509,10 @@ hr.thin {
 
   /* Hero Adjustments */
   #hero {
-    padding-top: 60px;
-    padding-bottom: 40px;
-    min-height: calc(100vh - 100px);
+    padding-top: 80px;
+    padding-bottom: 60px;
+    min-height: 100vh;
+    min-height: 100dvh;
   }
   .hero-inner {
     margin-top: 0;

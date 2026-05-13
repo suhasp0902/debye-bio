@@ -1,9 +1,7 @@
 import { Play, Shield, Download, File, FolderOpen, Save, Settings, Grid, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
-import { useState } from 'react';
 import { useReactFlow } from '@xyflow/react';
 
 export default function Topbar({ scenario, setScenario, onSimulate, onRunDRC, onExport, onNewProject, onSaveProject, onOpenProject, onClearCanvas, showGrid, setShowGrid, hasUnsavedChanges, nodeCount }) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { zoomIn, zoomOut, fitView } = useReactFlow();
   
   return (
@@ -42,7 +40,7 @@ export default function Topbar({ scenario, setScenario, onSimulate, onRunDRC, on
               <button onClick={() => setScenario(5)} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface">Implantable Drug Delivery</button>
               <div className="h-px bg-border my-1"></div>
               <button onClick={onExport} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface flex items-center gap-2">
-                <Download className="w-4 h-4" /> Export Fabrication Files...
+                <Download className="w-4 h-4" /> Export BOM & Netlist...
               </button>
             </div>
           </div>

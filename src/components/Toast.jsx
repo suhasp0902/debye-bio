@@ -1,7 +1,6 @@
-import { useEffect } from 'react';
 import { CheckCircle2, AlertCircle, XCircle } from 'lucide-react';
 
-export default function Toast({ toasts, removeToast }) {
+export default function Toast({ toasts }) {
   return (
     <div className="fixed top-[60px] right-4 z-50 flex flex-col gap-2">
       {toasts.map((toast) => (

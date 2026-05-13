@@ -8,8 +8,7 @@ import PropertiesPanel from '../components/PropertiesPanel';
 import Toast from '../components/Toast';
 import AiPromptModal from '../components/AiPromptModal';
 import { SCENARIOS } from '../data/scenarios';
-import { runSimulation } from '../lib/simulation';
-import { runDRC } from '../lib/drc';
+import { simulateDesign, runDesignRules, generateDesignBackend } from '../lib/backend';
 
 export default function Designer() {
   const [scenarioId, setScenarioId] = useState(null); // null means blank canvas
@@ -62,27 +61,42 @@ export default function Designer() {
     });
   };
 
+  const annotateEdgesWithSimulation = useCallback((rawEdges, data) => {
+    if (!data) return rawEdges;
+    return rawEdges.map(edge => {
+      if (edge.data?.type === 'bio') {
+        return { ...edge, data: { ...edge.data, label: data.impedance1kHz } };
+      }
+      if (edge.data?.type === 'mixed' && edge.data?.label) {
+        return { ...edge, data: { ...edge.data, label: data.signal || edge.data.label } };
+      }
+      return edge;
+    });
+  }, []);
+
   useEffect(() => {
     if (scenarioId === 0) {
-      setIsAiModalOpen(true);
+      setTimeout(() => setIsAiModalOpen(true), 0);
       return;
     }
 
     const scenario = SCENARIOS[scenarioId];
     if (scenario) {
-      setNodes(scenario.nodes);
-      setEdges(processEdges(scenario.edges));
-      setSimulationData(null);
-      setDrcResults(null);
-      setSelectedNode(null);
-      addLog(`Opened Example Project: ${scenario.name}`);
-      addLog(`Nodes: ${scenario.nodes.length} | Edges: ${scenario.edges.length}`);
-      
-      if (scenarioId === 1) setExternalMessage(`Explain the design context for the Continuous Glucose Monitor.`);
-      else if (scenarioId === 2) setExternalMessage(`Explain the design context for the Cardiac Arrhythmia Patch.`);
-      else if (scenarioId === 3) setExternalMessage(`Explain the design context for the Cancer Biomarker Chip.`);
-      else if (scenarioId === 4) setExternalMessage(`Explain the design context for the Electrical Wound-Healing Patch.`);
-      else if (scenarioId === 5) setExternalMessage(`Explain the design context for the Implantable Drug Delivery Device.`);
+      setTimeout(() => {
+        setNodes(scenario.nodes);
+        setEdges(processEdges(scenario.edges));
+        setSimulationData(null);
+        setDrcResults(null);
+        setSelectedNode(null);
+        addLog(`Opened Example Project: ${scenario.name}`);
+        addLog(`Nodes: ${scenario.nodes.length} | Edges: ${scenario.edges.length}`);
+        
+        if (scenarioId === 1) setExternalMessage(`Explain the design context for the Continuous Glucose Monitor.`);
+        else if (scenarioId === 2) setExternalMessage(`Explain the design context for the Cardiac Arrhythmia Patch.`);
+        else if (scenarioId === 3) setExternalMessage(`Explain the design context for the Cancer Biomarker Chip.`);
+        else if (scenarioId === 4) setExternalMessage(`Explain the design context for the Electrical Wound-Healing Patch.`);
+        else if (scenarioId === 5) setExternalMessage(`Explain the design context for the Implantable Drug Delivery Device.`);
+      }, 0);
     }
   }, [scenarioId]);
 
@@ -92,16 +106,17 @@ export default function Designer() {
     setSimRunning(true);
     setSimulationData(null);
     
-    setTimeout(() => {
-      const data = runSimulation(nodes, scenarioId);
+    setTimeout(async () => {
+      const data = await simulateDesign({ nodes, edges, scenarioId });
       setSimulationData(data);
+      setEdges(prev => annotateEdgesWithSimulation(prev, data));
       setSimRunning(false);
       addLog(`Mixed-Signal Simulation complete — Cole-Cole + Randles model`, 'success');
       addLog(`Tissue: ${data.tissue} | Material: ${data.material} | Electrode: ${data.electrodeArea} µm²`);
       addLog(`Impedance @ 1kHz: ${data.impedance1kHz} | Total noise: ${data.noiseTotal} µVrms | SNR: ${data.snr} dB`);
       addToast('Simulation complete');
     }, 1500);
-  }, [nodes, scenarioId]);
+  }, [nodes, edges, scenarioId, annotateEdgesWithSimulation]);
 
   const handleRunDRC = useCallback(() => {
     if (nodes.length === 0) { addToast('Canvas is empty — add components first', 'warning'); return; }
@@ -111,8 +126,8 @@ export default function Designer() {
     
     setNodes(nds => nds.map(n => ({ ...n, data: { ...n.data, status: undefined } })));
 
-    setTimeout(() => {
-      const results = runDRC(nodes, scenarioId, edges);
+    setTimeout(async () => {
+      const results = await runDesignRules({ nodes, edges, scenarioId });
       setDrcResults(results);
       setDrcRunning(false);
       
@@ -165,15 +180,40 @@ export default function Designer() {
     }
   };
 
-  const handleNodesChangeParent = (changes) => {};
+  const handleNodesChangeParent = () => {};
 
   const handleExport = () => {
     if (nodes.length === 0) {
        addToast('Canvas is empty. Nothing to export.', 'warning');
        return;
     }
-    addLog(`Exporting GDSII and Gerber files for fabrication...`);
-    addToast('Fabrication files and regulatory docs exported to /downloads', 'success');
+    addLog(`Generating BOM and Bio-Electrical Netlist...`);
+
+    let bom = "DEBYE BIO-ELECTRONICS SUITE\nBILL OF MATERIALS\n=================\n";
+    nodes.forEach(n => {
+       bom += `- [${n.type.toUpperCase()}] ${n.data.label || n.id}\n`;
+       if (n.data.material) bom += `  Material: ${n.data.material}\n`;
+       if (n.data.area) bom += `  Area: ${n.data.area} µm²\n`;
+    });
+
+    let netlist = "\nBIO-ELECTRICAL NETLIST\n=====================\n";
+    edges.forEach(e => {
+       const source = nodes.find(n => n.id === e.source)?.data.label || e.source;
+       const target = nodes.find(n => n.id === e.target)?.data.label || e.target;
+       netlist += `N_${e.id}: ${source} -> ${target} (${e.data?.type || 'mixed'})\n`;
+    });
+
+    const blob = new Blob([bom + netlist], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Debye_Export_${scenarioId || 'Custom'}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    addToast('BOM & Netlist exported successfully', 'success');
     addLog(`Export successful.`, 'success');
   };
 
@@ -181,7 +221,21 @@ export default function Designer() {
     setIsAiModalOpen(false);
     addLog(`AI Copilot generating design for: "${prompt}"...`);
     
-    setTimeout(() => {
+    setTimeout(async () => {
+      try {
+        const generated = await generateDesignBackend(prompt);
+        setNodes(generated.nodes || []);
+        setEdges(processEdges(generated.edges || []));
+        setSimulationData(generated.simulation || null);
+        setDrcResults(generated.drc || null);
+        setScenarioId(0);
+        addToast('AI design generated and validated', 'success');
+        setExternalMessage(generated.message || `Generated a starting design for: "${prompt}".`);
+        return;
+      } catch (err) {
+        addToast('AI generation unavailable - using offline template', 'warning');
+        addLog(`AI generation fallback: ${err.message}`, 'warning');
+      }
       const generatedNodes = [
         { id: 'bio-gen', type: 'biology', position: { x: 50, y: 150 }, data: { label: 'Gastric Mucosa', type: 'stomach', conductivity: 0.6, permittivity: 2200 } },
         { id: 'elec-gen1', type: 'electronics', position: { x: 300, y: 150 }, data: { label: 'Pacing Electrode', material: 'Platinum-Iridium', area: 2500 } },
@@ -205,17 +259,6 @@ export default function Designer() {
     }, 1500);
   };
 
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handler = (e) => {
-      if (e.key === 'F9') { e.preventDefault(); handleRunDRC(); }
-      if (e.key === 'F10') { e.preventDefault(); handleSimulate(); }
-      if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); handleSaveProject && handleSaveProject(); }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [handleRunDRC, handleSimulate]);
-
   const handleNewProject = () => {
     setScenarioId(null);
     setNodes([]);
@@ -227,9 +270,9 @@ export default function Designer() {
     addLog('New Blank Project created.');
   };
 
-  const handleSaveProject = () => {
+  const handleSaveProject = useCallback(() => {
     const projectName = scenarioId === null ? 'Untitled' : `Project_${scenarioId}`;
-    const data = JSON.stringify({ nodes, edges, scenarioId, savedAt: new Date().toISOString() }, null, 2);
+    const data = JSON.stringify({ schemaVersion: 2, nodes, edges, scenarioId, savedAt: new Date().toISOString() }, null, 2);
     const blob = new Blob([data], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -242,7 +285,18 @@ export default function Designer() {
     setHasUnsavedChanges(false);
     addToast('Project saved to device', 'success');
     addLog(`Project saved as "${projectName}.dsn"`, 'success');
-  };
+  }, [nodes, edges, scenarioId]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === 'F9') { e.preventDefault(); handleRunDRC(); }
+      if (e.key === 'F10') { e.preventDefault(); handleSimulate(); }
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); handleSaveProject(); }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [handleRunDRC, handleSimulate, handleSaveProject]);
 
   const handleOpenProject = () => {
     fileInputRef.current?.click();
@@ -318,7 +372,6 @@ export default function Designer() {
         
         <div className="flex-1 flex flex-col relative min-w-0 border-r border-border">
             <Canvas 
-              scenarioId={scenarioId}
               nodes={nodes}
               setNodes={setNodes}
               edges={edges}

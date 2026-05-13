@@ -1,64 +1,37 @@
+import { TISSUES, MATERIALS } from '../data/bioData';
+import { askCopilotBackend } from './backend';
+
 export async function askCopilot(message, designContext, conversationHistory = []) {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-  
-  if (!apiKey) {
-    // Mock response if no API key
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(`(Mock Mode - No VITE_GEMINI_API_KEY found)\n\nBased on your question about "${message}", I would normally analyze your design context to provide insights on tissue impedance, electrode materials, or signal integrity. Please add a Gemini API key to your .env file to enable the real AI.`);
-      }, 1500);
-    });
-  }
-
-  const systemInstruction = `You are Debye's AI design copilot — an expert in bioelectronics, 
-electrochemistry, and medical device design. You have deep knowledge of:
-- Electrode-tissue interface physics (Randles circuit, Cole-Cole model)
-- Biological noise sources (thermal, motion artifact, 1/f flicker, shot noise)
-- Electrode materials (Pt, PEDOT:PSS, Au, IrOx, TiN) and their properties
-- Biocompatibility (ISO 10993, FDA requirements)
-- Signal processing for biological waveforms
-- Tissue electrical properties (conductivity, permittivity, impedance)
-
-Current design context:
-${JSON.stringify(designContext)}
-
-Answer concisely. Be specific. Always cite physical reasoning. 
-When you suggest a change, explain the quantitative impact.
-Never guess — if you don't know a specific value, say so and give a range.
-Keep responses under 150 words unless the question requires more detail.`;
-
   try {
-    const contents = conversationHistory.map(msg => ({
-      role: msg.role === 'user' ? 'user' : 'model',
-      parts: [{ text: msg.content }]
-    }));
-    
-    contents.push({
-      role: 'user',
-      parts: [{ text: message }]
-    });
-
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        system_instruction: {
-          parts: [{ text: systemInstruction }]
-        },
-        contents: contents
-      })
-    });
-
-    const data = await response.json();
-    if (data.candidates && data.candidates[0].content.parts[0].text) {
-      return data.candidates[0].content.parts[0].text;
-    } else {
-      throw new Error("Invalid response from Gemini API");
-    }
+    return await askCopilotBackend(message, designContext, conversationHistory);
   } catch (err) {
-    console.error("Copilot API Error:", err);
-    return "Sorry, I encountered an error connecting to the AI service. Please check your API key and connection.";
+    console.warn('Using local copilot fallback:', err);
+    return offlineGroundedResponse(message, designContext);
   }
+}
+
+function offlineGroundedResponse(message, designContext) {
+  let response = '(Offline grounded mode)\n\n';
+  const mLower = message.toLowerCase();
+  let foundData = false;
+
+  for (const [key, tissue] of Object.entries(TISSUES)) {
+    if (mLower.includes(key) || mLower.includes(tissue.name.toLowerCase().split(' ')[0])) {
+      response += `${tissue.name}: R0 ${tissue.r0} ohm-cm, Rinf ${tissue.r_inf} ohm-cm, alpha ${tissue.cole_alpha}, tau ${tissue.tau}s, biological noise ${tissue.noise_uV} uVrms. Citation: ${tissue.citation}. `;
+      foundData = true;
+    }
+  }
+
+  for (const [key, mat] of Object.entries(MATERIALS)) {
+    if (mLower.includes(key) || mLower.includes(mat.name.toLowerCase().split(' ')[0])) {
+      response += `${mat.name}: CIL ${mat.cil} mC/cm2, EIS factor ${mat.eis_factor}. ${mat.notes} Citation: ${mat.citation}. `;
+      foundData = true;
+    }
+  }
+
+  if (!foundData) {
+    response += `I found ${designContext?.nodes?.length || 0} components in this design, but no specific tissue/material keyword in your question. I will not invent numeric values; ask about a named tissue, material, DRC issue, or simulation metric.`;
+  }
+
+  return response;
 }

@@ -22,7 +22,6 @@ const NODE_COLORS = {
 };
 
 export default function Canvas({ 
-  scenarioId,
   nodes, 
   setNodes, 
   edges, 
@@ -92,6 +91,7 @@ export default function Canvas({
 
       const type = event.dataTransfer.getData('application/reactflow');
       const label = event.dataTransfer.getData('application/label');
+      const itemId = event.dataTransfer.getData('application/item_id');
 
       if (typeof type === 'undefined' || !type) return;
 
@@ -104,7 +104,7 @@ export default function Canvas({
         id: `node_${Date.now()}`,
         type,
         position,
-        data: { label, role: label },
+        data: { label, role: label, item_id: itemId },
       };
 
       setNodes((nds) => nds.concat(newNode));

@@ -187,7 +187,7 @@ export default function LandingPage() {
 
 
       {/* ══ SECTION 01: HERO ═════════════════════════════════════════════ */}
-      <section id="hero" className="landing-section" style={{ paddingTop: 0, paddingBottom: 0 }}>
+      <section id="hero" className="landing-section">
         <div className="chapter-bg">01</div>
 
         <div className="hero-inner">

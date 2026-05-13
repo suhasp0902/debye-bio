@@ -1,16 +1,38 @@
-# React + Vite
+# Debye Bio-Electronics Suite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Debye is a prototype EDA environment for bio-electronic interfaces. The React designer is backed by Vercel Go API functions that compute tissue/electrode physics, design-rule checks, grounded copilot responses, and generated starting designs.
 
-Currently, two official plugins are available:
+## Backend API
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- `POST /api/simulate` runs Cole-Cole tissue impedance, Randles interface impedance with CPE and Warburg diffusion, Nernst potential, integrated noise budget, SNR, deterministic time-domain output, Nyquist data, Monte Carlo runs, and material variants.
+- `POST /api/drc` runs bio-electronic DRC/ERC checks for impedance, charge injection, reference electrodes, motion artifact filtering, chronic encapsulation, material approval, and architecture completeness.
+- `POST /api/copilot` calls Gemini server-side when `GEMINI_API_KEY` is present. Without the key, it returns deterministic grounded responses from the curated knowledge base.
+- `POST /api/generate-design` creates a schema-versioned canvas graph and immediately validates it.
+- `GET /api/knowledge` returns tissue, material, signal-band, and citation records.
 
-## React Compiler
+## Scientific Grounding
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Initial records cite:
 
-## Expanding the ESLint configuration
+- Gabriel et al. dielectric tissue measurements and parametric models: https://pubmed.ncbi.nlm.nih.gov/8938025/ and https://pubmed.ncbi.nlm.nih.gov/8938026/
+- Cogan, neural stimulation and recording electrodes: https://www.annualreviews.org/content/journals/10.1146/annurev.bioeng.10.061807.160518
+- Randles electrode kinetics: https://pubs.rsc.org/en/content/articlehtml/1947/df/df9470100011
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Local Checks
+
+```bash
+npm run lint
+npm run build
+go test ./api/... ./internal/...
+```
+
+On Windows in this workspace, Go may need to be invoked with its full path after installation:
+
+```powershell
+$env:GOCACHE='D:\Debye\debye-bio\.gocache'
+& 'C:\Program Files\Go\bin\go.exe' test ./api/... ./internal/...
+```
+
+## Environment
+
+Set `GEMINI_API_KEY` in Vercel project environment variables for server-side copilot reasoning. Do not expose Gemini keys with `VITE_` browser environment variables.
