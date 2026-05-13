@@ -135,7 +135,7 @@ export default function CopilotPanel({
           </div>
           <div>
             <div className="text-text-primary text-sm font-bold">Debye Copilot</div>
-            <div className="text-text-muted text-[10px]">Server-grounded biological literature</div>
+            <div className="text-text-muted text-[10px]">Powered by Gemini AI</div>
           </div>
         </div>
         <button 
@@ -148,13 +148,24 @@ export default function CopilotPanel({
 
       {/* Suggestions Box */}
       <div className="border-b border-border overflow-hidden flex flex-col">
-        <button 
-          onClick={() => setShowSuggestions(!showSuggestions)}
-          className="w-full px-4 py-2 bg-surface-raised flex items-center justify-between hover:bg-surface transition-colors"
-        >
-          <span className="text-[10px] text-text-muted font-bold uppercase tracking-wider">Context Suggestions</span>
-          {showSuggestions ? <ChevronUp className="w-3 h-3 text-text-muted" /> : <ChevronDown className="w-3 h-3 text-text-muted" />}
-        </button>
+        <div className="w-full px-4 py-2 bg-surface-raised flex items-center justify-between">
+          <button 
+            onClick={() => setShowSuggestions(!showSuggestions)}
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
+            <span className="text-[10px] text-text-muted font-bold uppercase tracking-wider">Context Suggestions</span>
+            {showSuggestions ? <ChevronUp className="w-3 h-3 text-text-muted" /> : <ChevronDown className="w-3 h-3 text-text-muted" />}
+          </button>
+          {showSuggestions && (
+            <button 
+              onClick={() => setShowSuggestions(false)}
+              className="p-0.5 hover:bg-red-500/10 rounded transition-colors text-text-muted hover:text-red-400"
+              title="Close suggestions"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          )}
+        </div>
         
         {showSuggestions && suggestions.length > 0 && (
           <div className="max-h-[200px] p-3 overflow-y-auto custom-scrollbar bg-surface shrink-0">

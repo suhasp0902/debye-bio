@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { ReactFlow, Controls, Background, MiniMap, applyNodeChanges, applyEdgeChanges, addEdge, Panel } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -42,6 +42,15 @@ export default function Canvas({
   onConnect: onConnectParent
 }) {
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
+  const [contextMenu, setContextMenu] = useState(null);
+  const contextMenuRef = useRef(null);
+
+  // Close context menu on outside click
+  useEffect(() => {
+    const handleClick = () => setContextMenu(null);
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, []);
 
   // Handle custom node deletion event
   useEffect(() => {
@@ -66,9 +75,8 @@ export default function Canvas({
   const onEdgesChange = useCallback(
     (changes) => {
       setEdges((eds) => applyEdgeChanges(changes, eds));
-      onConnectParent();
     },
-    [setEdges, onConnectParent]
+    [setEdges]
   );
   
   const onConnect = useCallback(
@@ -84,10 +92,32 @@ export default function Canvas({
     [setEdges, onConnectParent]
   );
 
-  const onEdgeClick = useCallback((_, edge) => {
-    // Edge is now selected, standard delete key will remove it
-    console.log('Edge selected:', edge.id);
-  }, []);
+  // Right-click on edge shows disconnect menu
+  const onEdgeContextMenu = useCallback((event, edge) => {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const sourceNode = nodes.find(n => n.id === edge.source);
+    const targetNode = nodes.find(n => n.id === edge.target);
+    const sourceLabel = sourceNode?.data?.label || edge.source;
+    const targetLabel = targetNode?.data?.label || edge.target;
+
+    setContextMenu({
+      x: event.clientX,
+      y: event.clientY,
+      edgeId: edge.id,
+      sourceLabel,
+      targetLabel,
+    });
+  }, [nodes]);
+
+  const handleDisconnect = useCallback(() => {
+    if (contextMenu?.edgeId) {
+      setEdges((eds) => eds.filter((e) => e.id !== contextMenu.edgeId));
+      onConnectParent();
+    }
+    setContextMenu(null);
+  }, [contextMenu, setEdges, onConnectParent]);
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -121,14 +151,6 @@ export default function Canvas({
     [reactFlowInstance, setNodes]
   );
 
-  const onEdgeContextMenu = useCallback((event, edge) => {
-    event.preventDefault();
-    if (window.confirm('Disconnect these components?')) {
-      setEdges((eds) => eds.filter((e) => e.id !== edge.id));
-      onConnectParent();
-    }
-  }, [setEdges, onConnectParent]);
-
   const onNodeClick = (_, node) => setSelectedNode(node);
 
   const onNodeContextMenu = (event, node) => {
@@ -136,7 +158,10 @@ export default function Canvas({
     onContextMenuExplain(`Explain this component: ${node.data.label || node.type}`);
   };
 
-  const onPaneClick = () => setSelectedNode(null);
+  const onPaneClick = () => {
+    setSelectedNode(null);
+    setContextMenu(null);
+  };
 
   return (
     <div className="flex-1 h-full relative">
@@ -154,7 +179,6 @@ export default function Canvas({
         onNodeContextMenu={onNodeContextMenu}
         onEdgeContextMenu={onEdgeContextMenu}
         onPaneClick={onPaneClick}
-        onEdgeClick={onEdgeClick}
         fitView
         connectionRadius={40}
         connectionMode="loose"
@@ -194,13 +218,36 @@ export default function Canvas({
                   F9 → Run DRC
                 </div>
                 <div className="text-xs text-text-muted bg-surface-raised border border-border rounded px-3 py-1.5">
-                  Del → Remove node
+                  Right-click edge → Disconnect
                 </div>
               </div>
             </div>
           </Panel>
         )}
       </ReactFlow>
+
+      {/* Edge Context Menu (Disconnect) */}
+      {contextMenu && (
+        <div 
+          ref={contextMenuRef}
+          className="fixed z-[9999] bg-surface-raised border border-border rounded-lg shadow-2xl py-1 min-w-[220px]"
+          style={{ left: contextMenu.x, top: contextMenu.y }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="px-3 py-1.5 text-[10px] text-text-muted font-bold uppercase tracking-wider border-b border-border">
+            Connection
+          </div>
+          <div className="px-3 py-1.5 text-xs text-text-secondary">
+            {contextMenu.sourceLabel} → {contextMenu.targetLabel}
+          </div>
+          <button 
+            onClick={handleDisconnect}
+            className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2 transition-colors"
+          >
+            <span>✕</span> Disconnect
+          </button>
+        </div>
+      )}
     </div>
   );
 }
