@@ -1,5 +1,5 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
-import { ReactFlow, Controls, Background, MiniMap, applyNodeChanges, applyEdgeChanges, addEdge, Panel } from '@xyflow/react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import { ReactFlow, Controls, Background, MiniMap, applyNodeChanges, applyEdgeChanges, addEdge, Panel, getBezierPath, BaseEdge } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
 import BiologyNode from './nodes/BiologyNode';
@@ -30,6 +30,67 @@ const NODE_COLORS = {
   microfluidics: '#3B82F6',
 };
 
+// Custom edge with X button for disconnect
+function DeletableEdge({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style, markerEnd, selected, data }) {
+  const [edgePath, labelX, labelY] = getBezierPath({ sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition });
+  
+  const edgeColor = (() => {
+    if (data?.type === 'bio') return '#22D3EE';
+    if (data?.type === 'elec') return '#6366F1';
+    return '#818CF8';
+  })();
+
+  return (
+    <>
+      <BaseEdge 
+        path={edgePath} 
+        markerEnd={markerEnd} 
+        style={{ 
+          ...style, 
+          stroke: selected ? '#f43f5e' : edgeColor, 
+          strokeWidth: selected ? 3 : 2,
+          filter: selected ? 'drop-shadow(0 0 4px rgba(244,63,94,0.5))' : 'none',
+        }} 
+      />
+      {selected && (
+        <foreignObject
+          width={24}
+          height={24}
+          x={labelX - 12}
+          y={labelY - 12}
+          requiredExtensions="http://www.w3.org/1999/xhtml"
+        >
+          <button
+            className="w-6 h-6 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg border-2 border-white cursor-pointer transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              window.dispatchEvent(new CustomEvent('debye-delete-edge', { detail: { id } }));
+            }}
+            title="Disconnect"
+          >
+            ✕
+          </button>
+        </foreignObject>
+      )}
+      {data?.label && (
+        <foreignObject
+          width={80}
+          height={20}
+          x={labelX - 40}
+          y={labelY - 28}
+          requiredExtensions="http://www.w3.org/1999/xhtml"
+        >
+          <div className="text-[10px] text-center text-text-muted font-bold bg-background/80 rounded px-1">
+            {data.label}
+          </div>
+        </foreignObject>
+      )}
+    </>
+  );
+}
+
+const edgeTypes = { default: DeletableEdge };
+
 export default function Canvas({ 
   nodes, 
   setNodes, 
@@ -42,15 +103,6 @@ export default function Canvas({
   onConnect: onConnectParent
 }) {
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
-  const [contextMenu, setContextMenu] = useState(null);
-  const contextMenuRef = useRef(null);
-
-  // Close context menu on outside click
-  useEffect(() => {
-    const handleClick = () => setContextMenu(null);
-    document.addEventListener('click', handleClick);
-    return () => document.removeEventListener('click', handleClick);
-  }, []);
 
   // Handle custom node deletion event
   useEffect(() => {
@@ -63,6 +115,17 @@ export default function Canvas({
     window.addEventListener('debye-delete-node', handleDeleteNode);
     return () => window.removeEventListener('debye-delete-node', handleDeleteNode);
   }, [setNodes, setEdges]);
+
+  // Handle custom edge deletion event (from the X button on edge)
+  useEffect(() => {
+    const handleDeleteEdge = (e) => {
+      const { id } = e.detail;
+      setEdges((eds) => eds.filter((edge) => edge.id !== id));
+    };
+
+    window.addEventListener('debye-delete-edge', handleDeleteEdge);
+    return () => window.removeEventListener('debye-delete-edge', handleDeleteEdge);
+  }, [setEdges]);
 
   const onNodesChange = useCallback(
     (changes) => {
@@ -83,41 +146,14 @@ export default function Canvas({
     (params) => {
       setEdges((eds) => addEdge({ 
         ...params, 
+        type: 'default',
         animated: true, 
         data: { type: 'mixed' }, 
-        style: { stroke: '#818CF8', strokeWidth: 2 } 
       }, eds));
       onConnectParent();
     },
     [setEdges, onConnectParent]
   );
-
-  // Right-click on edge shows disconnect menu
-  const onEdgeContextMenu = useCallback((event, edge) => {
-    event.preventDefault();
-    event.stopPropagation();
-    
-    const sourceNode = nodes.find(n => n.id === edge.source);
-    const targetNode = nodes.find(n => n.id === edge.target);
-    const sourceLabel = sourceNode?.data?.label || edge.source;
-    const targetLabel = targetNode?.data?.label || edge.target;
-
-    setContextMenu({
-      x: event.clientX,
-      y: event.clientY,
-      edgeId: edge.id,
-      sourceLabel,
-      targetLabel,
-    });
-  }, [nodes]);
-
-  const handleDisconnect = useCallback(() => {
-    if (contextMenu?.edgeId) {
-      setEdges((eds) => eds.filter((e) => e.id !== contextMenu.edgeId));
-      onConnectParent();
-    }
-    setContextMenu(null);
-  }, [contextMenu, setEdges, onConnectParent]);
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -158,16 +194,18 @@ export default function Canvas({
     onContextMenuExplain(`Explain this component: ${node.data.label || node.type}`);
   };
 
-  const onPaneClick = () => {
-    setSelectedNode(null);
-    setContextMenu(null);
-  };
+  const onPaneClick = () => setSelectedNode(null);
+
+  // Ensure all edges use our custom type
+  const processedEdges = useMemo(() => {
+    return edges.map(e => ({ ...e, type: 'default' }));
+  }, [edges]);
 
   return (
     <div className="flex-1 h-full relative">
       <ReactFlow
         nodes={nodes}
-        edges={edges}
+        edges={processedEdges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
@@ -175,9 +213,9 @@ export default function Canvas({
         onDrop={onDrop}
         onDragOver={onDragOver}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         onNodeClick={onNodeClick}
         onNodeContextMenu={onNodeContextMenu}
-        onEdgeContextMenu={onEdgeContextMenu}
         onPaneClick={onPaneClick}
         fitView
         connectionRadius={40}
@@ -218,36 +256,13 @@ export default function Canvas({
                   F9 → Run DRC
                 </div>
                 <div className="text-xs text-text-muted bg-surface-raised border border-border rounded px-3 py-1.5">
-                  Right-click edge → Disconnect
+                  Click edge → ✕ Disconnect
                 </div>
               </div>
             </div>
           </Panel>
         )}
       </ReactFlow>
-
-      {/* Edge Context Menu (Disconnect) */}
-      {contextMenu && (
-        <div 
-          ref={contextMenuRef}
-          className="fixed z-[9999] bg-surface-raised border border-border rounded-lg shadow-2xl py-1 min-w-[220px]"
-          style={{ left: contextMenu.x, top: contextMenu.y }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="px-3 py-1.5 text-[10px] text-text-muted font-bold uppercase tracking-wider border-b border-border">
-            Connection
-          </div>
-          <div className="px-3 py-1.5 text-xs text-text-secondary">
-            {contextMenu.sourceLabel} → {contextMenu.targetLabel}
-          </div>
-          <button 
-            onClick={handleDisconnect}
-            className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2 transition-colors"
-          >
-            <span>✕</span> Disconnect
-          </button>
-        </div>
-      )}
     </div>
   );
 }

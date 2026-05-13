@@ -53,7 +53,7 @@ const PALETTE_ITEMS = [
       { id: 'el_adc',      label: 'ADC',                   type: 'electronics', role: 'Mixed',      info: '24-bit' },
       { id: 'el_dac',      label: 'DAC',                   type: 'electronics', role: 'Mixed',      info: '16-bit' },
       { id: 'el_filter',   label: 'Bandpass Filter',       type: 'electronics', role: 'Analog',     info: 'BPF' },
-      { id: 'el_stim',     label: 'Pulse Generator',       type: 'electronics', role: 'Stimulator', info: 'Biphasic' },
+      { id: 'el_stim',     label: 'Pulse Generator',       type: 'neuromodulation', role: 'Stimulator', info: 'Biphasic' },
       { id: 'el_mcu',      label: 'Microcontroller',       type: 'electronics', role: 'Logic',      info: 'MCU' },
       { id: 'el_pot',      label: 'Potentiostat',          type: 'electronics', role: 'Analog',     info: '3-elec' },
       { id: 'el_tx',       label: 'Bluetooth LE',          type: 'electronics', role: 'Wireless',   info: 'BLE 5.0' },
