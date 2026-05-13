@@ -107,7 +107,7 @@ func NormalizeDesign(req Request) NormalizedDesign {
 			}
 		}
 
-		if nodeType == "material" || nodeType == "electronics" {
+		if nodeType == "material" || nodeType == "electronics" || nodeType == "electrode" || nodeType == "neuromodulation" {
 			if material, ok := ResolveMaterial(label, itemID); ok {
 				design.Material = material
 			}

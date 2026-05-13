@@ -121,6 +121,14 @@ export default function Canvas({
     [reactFlowInstance, setNodes]
   );
 
+  const onEdgeContextMenu = useCallback((event, edge) => {
+    event.preventDefault();
+    if (window.confirm('Disconnect these components?')) {
+      setEdges((eds) => eds.filter((e) => e.id !== edge.id));
+      onConnectParent();
+    }
+  }, [setEdges, onConnectParent]);
+
   const onNodeClick = (_, node) => setSelectedNode(node);
 
   const onNodeContextMenu = (event, node) => {
@@ -144,12 +152,13 @@ export default function Canvas({
         nodeTypes={nodeTypes}
         onNodeClick={onNodeClick}
         onNodeContextMenu={onNodeContextMenu}
+        onEdgeContextMenu={onEdgeContextMenu}
         onPaneClick={onPaneClick}
         onEdgeClick={onEdgeClick}
         fitView
         connectionRadius={40}
         connectionMode="loose"
-        deleteKeyCode="Delete"
+        deleteKeyCode={['Delete', 'Backspace']}
         proOptions={{ hideAttribution: true }}
         className="debye-canvas"
       >

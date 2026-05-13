@@ -131,7 +131,9 @@ func electrodeNodes(nodes []Node) []Node {
 	for _, node := range nodes {
 		label := lowerString(node.Data["label"])
 		role := lowerString(node.Data["role"])
-		if node.Type == "electronics" && (strings.Contains(label, "electrode") || strings.Contains(role, "interface") || strings.Contains(role, "electrode")) {
+		nodeType := strings.ToLower(node.Type)
+		if (nodeType == "electronics" || nodeType == "electrode" || nodeType == "neuromodulation") && 
+		   (strings.Contains(label, "electrode") || strings.Contains(role, "interface") || strings.Contains(role, "electrode") || nodeType == "electrode") {
 			out = append(out, node)
 		}
 	}

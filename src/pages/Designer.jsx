@@ -246,9 +246,9 @@ export default function Designer() {
       }
       const generatedNodes = [
         { id: 'bio-gen', type: 'biology', position: { x: 50, y: 150 }, data: { label: 'Gastric Mucosa', type: 'stomach', conductivity: 0.6, permittivity: 2200 } },
-        { id: 'elec-gen1', type: 'electronics', position: { x: 300, y: 150 }, data: { label: 'Pacing Electrode', material: 'Platinum-Iridium', area: 2500 } },
+        { id: 'elec-gen1', type: 'electrode', position: { x: 300, y: 150 }, data: { label: 'Pacing Electrode', material: 'Platinum-Iridium', area: 2500, role: 'Electrode Contact' } },
         { id: 'mat-gen', type: 'material', position: { x: 300, y: 350 }, data: { label: 'Titanium Enclosure', iso: true, chronic: true } },
-        { id: 'elec-gen2', type: 'electronics', position: { x: 550, y: 150 }, data: { label: 'Stimulator / IPG', current: '2 mA' } }
+        { id: 'elec-gen2', type: 'neuromodulation', position: { x: 550, y: 150 }, data: { label: 'Stimulator / IPG', current: '2 mA', role: 'Pulse Generator' } }
       ];
       const generatedEdges = [
         { id: 'egen1', source: 'elec-gen1', target: 'bio-gen', animated: true, data: { label: '350 Ω', type: 'bio' } },
