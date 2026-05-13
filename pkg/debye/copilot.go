@@ -81,7 +81,7 @@ func callGemini(req Request, evidence []map[string]any) (string, error) {
 	}
 	payload, _ := json.Marshal(body)
 	client := http.Client{Timeout: 20 * time.Second}
-	resp, err := client.Post("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key="+key, "application/json", bytes.NewReader(payload))
+	resp, err := client.Post("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="+key, "application/json", bytes.NewReader(payload))
 	if err != nil {
 		return "", err
 	}
