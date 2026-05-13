@@ -1,4 +1,4 @@
-import { Play, Shield, Download, File, FolderOpen, Save, Settings, Grid, ZoomIn, ZoomOut, Maximize, LayoutPanelRight, MessageSquare, TerminalSquare } from 'lucide-react';
+import { Play, Shield, Download, File, FolderOpen, Save, Settings, Grid, ZoomIn, ZoomOut, Maximize, PanelRight, MessageSquare, TerminalSquare } from 'lucide-react';
 import { useReactFlow } from '@xyflow/react';
 
 export default function Topbar({ 
@@ -195,7 +195,7 @@ export default function Topbar({
         
         <div className="flex items-center gap-0.5 ml-2">
           <button onClick={() => setShowProperties(!showProperties)} className={`p-1.5 rounded tooltip-trigger ${showProperties ? 'text-accent-primary bg-accent-primary/10' : 'text-text-muted hover:text-text-primary hover:bg-surface-raised'}`} title="Toggle Properties Panel">
-            <LayoutPanelRight className="w-4 h-4" />
+            <PanelRight className="w-4 h-4" />
           </button>
           <button onClick={() => setShowCopilot(!showCopilot)} className={`p-1.5 rounded tooltip-trigger ${showCopilot ? 'text-accent-primary bg-accent-primary/10' : 'text-text-muted hover:text-text-primary hover:bg-surface-raised'}`} title="Toggle AI Copilot">
             <MessageSquare className="w-4 h-4" />
