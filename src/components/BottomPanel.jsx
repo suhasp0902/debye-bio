@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { ChevronDown, ChevronUp, Activity, Shield, Sliders, TerminalSquare } from 'lucide-react';
+import { useState, useRef, useCallback } from 'react';
+import { ChevronDown, ChevronUp, Activity, Shield, Sliders, TerminalSquare, X, GripHorizontal } from 'lucide-react';
 import SimulationTab from './tabs/SimulationTab';
 import DRCTab from './tabs/DRCTab';
 import PropertiesTab from './tabs/PropertiesTab';
@@ -17,9 +17,35 @@ export default function BottomPanel({
   drcRunning,
   onExplain,
   onFixDRC,
-  nodes
+  nodes,
+  height,
+  setHeight,
+  onClose
 }) {
   const [collapsed, setCollapsed] = useState(false);
+  const isResizing = useRef(false);
+
+  const startResizing = useCallback((e) => {
+    isResizing.current = true;
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', stopResizing);
+    document.body.style.cursor = 'row-resize';
+  }, []);
+
+  const stopResizing = useCallback(() => {
+    isResizing.current = false;
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', stopResizing);
+    document.body.style.cursor = 'default';
+  }, []);
+
+  const handleMouseMove = useCallback((e) => {
+    if (!isResizing.current) return;
+    const newHeight = window.innerHeight - e.clientY;
+    if (newHeight > 100 && newHeight < window.innerHeight * 0.8) {
+      setHeight(newHeight);
+    }
+  }, [setHeight]);
 
   const tabs = [
     { id: 'simulation', label: 'Simulation', icon: <Activity className="w-4 h-4" /> },
@@ -29,7 +55,20 @@ export default function BottomPanel({
   ];
 
   return (
-    <div className={`bg-surface border-t border-border flex flex-col transition-all duration-300 ease-in-out shrink-0 relative z-20 ${collapsed ? 'h-[40px]' : 'h-[280px]'}`}>
+    <div 
+      className={`bg-surface border-t border-border flex flex-col transition-all shrink-0 relative z-30 shadow-[0_-8px_30px_rgb(0,0,0,0.12)] group/panel`} 
+      style={{ height: collapsed ? '40px' : `${height}px` }}
+    >
+      {/* Resize Handle */}
+      <div 
+        onMouseDown={startResizing}
+        className="absolute top-0 left-0 right-0 h-1 cursor-row-resize hover:bg-accent-primary/50 transition-colors z-40"
+      >
+        <div className="absolute left-1/2 top-0 -translate-x-1/2 opacity-0 group-hover/panel:opacity-100 transition-opacity">
+           <GripHorizontal className="w-3 h-3 text-text-muted" />
+        </div>
+      </div>
+
       <div className="flex items-center justify-between px-2 bg-surface-raised border-b border-border h-[40px] shrink-0">
         <div className="flex h-full">
           {tabs.map(tab => (
@@ -50,16 +89,24 @@ export default function BottomPanel({
           ))}
         </div>
         
-        <button 
-          onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 text-text-muted hover:text-text-primary transition-colors"
-        >
-          {collapsed ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-        </button>
+        <div className="flex items-center gap-1">
+          <button 
+            onClick={() => setCollapsed(!collapsed)}
+            className="p-1.5 text-text-muted hover:text-text-primary transition-colors"
+          >
+            {collapsed ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+          </button>
+          <button 
+            onClick={onClose}
+            className="p-1.5 text-text-muted hover:text-red-400 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {!collapsed && (
-        <div className="flex-1 min-h-0 bg-surface relative z-10">
+        <div className="flex-1 min-h-0 bg-surface relative z-10 overflow-hidden">
           {activeTab === 'simulation' && <SimulationTab data={simulationData} isRunning={simRunning} />}
           {activeTab === 'drc' && <DRCTab results={drcResults} isRunning={drcRunning} onExplain={onExplain} onFix={onFixDRC} nodes={nodes} />}
           {activeTab === 'properties' && <PropertiesTab selectedNode={selectedNode} onUpdateNode={onUpdateNode} />}

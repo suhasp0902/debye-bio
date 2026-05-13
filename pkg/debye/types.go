@@ -109,6 +109,8 @@ type NormalizedDesign struct {
 	HasEncapsulant   bool       `json:"hasEncapsulant"`
 	StimCurrentMA    float64    `json:"stimCurrentMA"`
 	PulseWidthMS     float64    `json:"pulseWidthMS"`
+	FlowRateULMin    float64    `json:"flowRateULMin"`
+	ChannelWidthUM   float64    `json:"channelWidthUM"`
 }
 
 type SimulationResponse struct {
@@ -131,6 +133,9 @@ type SimulationResponse struct {
 	SafetyMargins    map[string]float64 `json:"safetyMargins"`
 	Citations        []Citation         `json:"citations"`
 	Normalized       NormalizedDesign   `json:"normalized"`
+	NeuralData       []NeuralPoint      `json:"neuralData,omitempty"`
+	FluidicData      []FluidicPoint     `json:"fluidicData,omitempty"`
+	Compliance       []ComplianceCheck  `json:"compliance,omitempty"`
 }
 
 type EISPoint struct {
@@ -195,4 +200,25 @@ type Violation struct {
 	Citation string         `json:"citation,omitempty"`
 	Fixable  bool           `json:"fixable"`
 	Autofix  map[string]any `json:"autofix,omitempty"`
+}
+
+type NeuralPoint struct {
+	Time   float64 `json:"time"`
+	Spike  float64 `json:"spike"`
+	LFP    float64 `json:"lfp"`
+	Raw    float64 `json:"raw"`
+}
+
+type FluidicPoint struct {
+	Position float64 `json:"position"`
+	Pressure float64 `json:"pressure"`
+	Velocity float64 `json:"velocity"`
+}
+
+type ComplianceCheck struct {
+	Standard string `json:"standard"`
+	Status   string `json:"status"` // "PASS", "FAIL", "WARNING"
+	Value    string `json:"value"`
+	Limit    string `json:"limit"`
+	Details  string `json:"details"`
 }

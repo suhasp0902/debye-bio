@@ -1,7 +1,27 @@
-import { Play, Shield, Download, File, FolderOpen, Save, Settings, Grid, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
+import { Play, Shield, Download, File, FolderOpen, Save, Settings, Grid, ZoomIn, ZoomOut, Maximize, LayoutPanelRight, MessageSquare, TerminalSquare } from 'lucide-react';
 import { useReactFlow } from '@xyflow/react';
 
-export default function Topbar({ scenario, setScenario, onSimulate, onRunDRC, onExport, onNewProject, onSaveProject, onOpenProject, onClearCanvas, showGrid, setShowGrid, hasUnsavedChanges, nodeCount }) {
+export default function Topbar({ 
+  scenario, 
+  setScenario, 
+  onSimulate, 
+  onRunDRC, 
+  onExport, 
+  onNewProject, 
+  onSaveProject, 
+  onOpenProject, 
+  onClearCanvas, 
+  showGrid, 
+  setShowGrid, 
+  hasUnsavedChanges, 
+  nodeCount,
+  showProperties,
+  setShowProperties,
+  showCopilot,
+  setShowCopilot,
+  showBottomPanel,
+  setShowBottomPanel
+}) {
   const { zoomIn, zoomOut, fitView } = useReactFlow();
   
   return (
@@ -59,10 +79,23 @@ export default function Topbar({ scenario, setScenario, onSimulate, onRunDRC, on
           {/* View Menu */}
           <div className="relative group">
             <button className="px-3 py-1 text-text-secondary hover:bg-surface-raised hover:text-text-primary rounded cursor-default">View</button>
-            <div className="absolute left-0 top-full mt-0 w-48 bg-surface-raised border border-border rounded-md shadow-lg hidden group-hover:block py-1 z-50">
+            <div className="absolute left-0 top-full mt-0 w-56 bg-surface-raised border border-border rounded-md shadow-lg hidden group-hover:block py-1 z-50">
               <button onClick={() => setShowGrid(!showGrid)} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface flex items-center justify-between">
                 <span>Show Grid</span>
                 {showGrid && <span className="text-accent-primary">✓</span>}
+              </button>
+              <div className="h-px bg-border my-1"></div>
+              <button onClick={() => setShowProperties(!showProperties)} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface flex items-center justify-between">
+                <span>Properties Inspector</span>
+                {showProperties && <span className="text-accent-primary">✓</span>}
+              </button>
+              <button onClick={() => setShowCopilot(!showCopilot)} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface flex items-center justify-between">
+                <span>AI Copilot</span>
+                {showCopilot && <span className="text-accent-primary">✓</span>}
+              </button>
+              <button onClick={() => setShowBottomPanel(!showBottomPanel)} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface flex items-center justify-between">
+                <span>Bottom Panel</span>
+                {showBottomPanel && <span className="text-accent-primary">✓</span>}
               </button>
               <div className="h-px bg-border my-1"></div>
               <button onClick={() => zoomIn()} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface">Zoom In</button>
@@ -159,6 +192,21 @@ export default function Topbar({ scenario, setScenario, onSimulate, onRunDRC, on
         <button onClick={() => setShowGrid(!showGrid)} className={`p-1.5 rounded tooltip-trigger ${showGrid ? 'text-accent-primary bg-accent-primary/10' : 'text-text-muted hover:text-text-primary hover:bg-surface-raised'}`} title="Show/Hide Grid">
           <Grid className="w-4 h-4" />
         </button>
+        
+        <div className="flex items-center gap-0.5 ml-2">
+          <button onClick={() => setShowProperties(!showProperties)} className={`p-1.5 rounded tooltip-trigger ${showProperties ? 'text-accent-primary bg-accent-primary/10' : 'text-text-muted hover:text-text-primary hover:bg-surface-raised'}`} title="Toggle Properties Panel">
+            <LayoutPanelRight className="w-4 h-4" />
+          </button>
+          <button onClick={() => setShowCopilot(!showCopilot)} className={`p-1.5 rounded tooltip-trigger ${showCopilot ? 'text-accent-primary bg-accent-primary/10' : 'text-text-muted hover:text-text-primary hover:bg-surface-raised'}`} title="Toggle AI Copilot">
+            <MessageSquare className="w-4 h-4" />
+          </button>
+          <button onClick={() => setShowBottomPanel(!showBottomPanel)} className={`p-1.5 rounded tooltip-trigger ${showBottomPanel ? 'text-accent-primary bg-accent-primary/10' : 'text-text-muted hover:text-text-primary hover:bg-surface-raised'}`} title="Toggle Bottom Panel">
+            <TerminalSquare className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="h-5 w-px bg-border mx-2"></div>
+
         <button onClick={() => zoomIn()} className="p-1.5 text-text-muted hover:text-text-primary hover:bg-surface-raised rounded tooltip-trigger" title="Zoom In">
           <ZoomIn className="w-4 h-4" />
         </button>

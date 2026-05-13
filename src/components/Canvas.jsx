@@ -6,19 +6,28 @@ import BiologyNode from './nodes/BiologyNode';
 import ElectronicsNode from './nodes/ElectronicsNode';
 import MaterialNode from './nodes/MaterialNode';
 import BiochemistryNode from './nodes/BiochemistryNode';
+import ElectrodeNode from './nodes/ElectrodeNode';
+import NeuroNode from './nodes/NeuroNode';
+import FluidicsNode from './nodes/FluidicsNode';
 
 const nodeTypes = {
   biology: BiologyNode,
   electronics: ElectronicsNode,
   material: MaterialNode,
   biochemistry: BiochemistryNode,
+  electrode: ElectrodeNode,
+  neuromodulation: NeuroNode,
+  microfluidics: FluidicsNode,
 };
 
 const NODE_COLORS = {
   biology: '#22D3EE',
-  electronics: '#6366F1',
-  material: '#F59E0B',
+  electronics: '#A78BFA',
+  material: '#E879F9',
   biochemistry: '#10B981',
+  electrode: '#6366F1',
+  neuromodulation: '#FB923C',
+  microfluidics: '#3B82F6',
 };
 
 export default function Canvas({ 

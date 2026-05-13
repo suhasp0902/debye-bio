@@ -30,6 +30,14 @@ export default function Designer() {
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [showGrid, setShowGrid] = useState(true);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  
+  // Panel Visibility States
+  const [showProperties, setShowProperties] = useState(true);
+  const [showCopilot, setShowCopilot] = useState(true);
+  const [showBottomPanel, setShowBottomPanel] = useState(true);
+  const [bottomPanelHeight, setBottomPanelHeight] = useState(320);
+  const [copilotWidth, setCopilotWidth] = useState(320);
+
   const fileInputRef = useRef(null);
 
   const addLog = (msg, type = 'info') => {
@@ -365,6 +373,12 @@ export default function Designer() {
         setShowGrid={setShowGrid}
         hasUnsavedChanges={hasUnsavedChanges}
         nodeCount={nodes.length}
+        showProperties={showProperties}
+        setShowProperties={setShowProperties}
+        showCopilot={showCopilot}
+        setShowCopilot={setShowCopilot}
+        showBottomPanel={showBottomPanel}
+        setShowBottomPanel={setShowBottomPanel}
       />
       
       <div className="flex-1 flex min-h-0 relative">
@@ -377,8 +391,14 @@ export default function Designer() {
               edges={edges}
               setEdges={setEdges}
               showGrid={showGrid}
-              setSelectedNode={setSelectedNode}
-              onContextMenuExplain={(msg) => setExternalMessage(msg)}
+              setSelectedNode={(node) => {
+                setSelectedNode(node);
+                if (node) setShowProperties(true);
+              }}
+              onContextMenuExplain={(msg) => {
+                setExternalMessage(msg);
+                setShowCopilot(true);
+              }}
               onNodesChangeParent={(changes) => {
                 handleNodesChangeParent(changes);
                 if (changes.some(c => c.type !== 'select')) setHasUnsavedChanges(true);
@@ -386,33 +406,49 @@ export default function Designer() {
               onConnect={() => setHasUnsavedChanges(true)}
             />
           
-          <BottomPanel 
-            simulationData={simulationData}
-            drcResults={drcResults}
-            logs={logs}
-            selectedNode={selectedNode}
-            onUpdateNode={handleUpdateNode}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            simRunning={simRunning}
-            drcRunning={drcRunning}
-            onExplain={(msg) => setExternalMessage(msg)}
-            onFixDRC={handleApplySuggestion}
-            nodes={nodes}
-          />
+          {showBottomPanel && (
+            <BottomPanel 
+              simulationData={simulationData}
+              drcResults={drcResults}
+              logs={logs}
+              selectedNode={selectedNode}
+              onUpdateNode={handleUpdateNode}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              simRunning={simRunning}
+              drcRunning={drcRunning}
+              onExplain={(msg) => {
+                setExternalMessage(msg);
+                setShowCopilot(true);
+              }}
+              onFixDRC={handleApplySuggestion}
+              nodes={nodes}
+              height={bottomPanelHeight}
+              setHeight={setBottomPanelHeight}
+              onClose={() => setShowBottomPanel(false)}
+            />
+          )}
         </div>
 
-        <PropertiesPanel 
-          selectedNode={selectedNode}
-          onUpdateNode={handleUpdateNode}
-        />
+        {selectedNode && showProperties && (
+          <PropertiesPanel 
+            selectedNode={selectedNode}
+            onUpdateNode={handleUpdateNode}
+            onClose={() => setShowProperties(false)}
+          />
+        )}
 
-        <CopilotPanel 
-          designContext={{ scenarioId, nodes, edges, drcResults, simulationData }}
-          onApplySuggestion={handleApplySuggestion}
-          externalMessage={externalMessage}
-          onExternalMessageProcessed={() => setExternalMessage('')}
-        />
+        {showCopilot && (
+          <CopilotPanel 
+            designContext={{ scenarioId, nodes, edges, drcResults, simulationData }}
+            onApplySuggestion={handleApplySuggestion}
+            externalMessage={externalMessage}
+            onExternalMessageProcessed={() => setExternalMessage('')}
+            width={copilotWidth}
+            setWidth={setCopilotWidth}
+            onClose={() => setShowCopilot(false)}
+          />
+        )}
       </div>
     </div>
   );

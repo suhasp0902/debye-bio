@@ -20,8 +20,10 @@ const PALETTE_ITEMS = [
       { id: 'bio_retina',  label: 'Retina',               type: 'biology',     role: 'Tissue',     info: 'σ=0.28 S/m' },
       { id: 'bio_liver',   label: 'Liver',                type: 'biology',     role: 'Tissue',     info: 'σ=0.28 S/m' },
       { id: 'bio_bone',    label: 'Bone (Cortical)',      type: 'biology',     role: 'Structural', info: 'σ=0.006 S/m' },
-      { id: 'bio_csf',     label: 'Cerebrospinal Fluid',  type: 'biology',     role: 'Fluid',      info: 'σ=1.79 S/m' },
-      { id: 'bio_fat',     label: 'Adipose Tissue',       type: 'biology',     role: 'Tissue',     info: 'σ=0.04 S/m' },
+      { id: 'bio_csf',     label: 'CSF (Brain Fluid)',    type: 'biology', role: 'Fluid',       info: '1.79 S/m' },
+      { id: 'bio_fat',     label: 'Adipose Tissue',       type: 'biology', role: 'Tissue',      info: '0.04 S/m' },
+      { id: 'bio_vagus',   label: 'Vagus Nerve',          type: 'biology', role: 'Nerve',       info: '0.12 S/m' },
+      { id: 'bio_spinal',  label: 'Spinal Cord',          type: 'biology', role: 'Nerve',       info: '0.22 S/m' },
     ]
   },
   {
@@ -29,14 +31,16 @@ const PALETTE_ITEMS = [
     icon: <Zap className="w-4 h-4 text-indigo-400" />,
     color: 'text-indigo-400',
     items: [
-      { id: 'el_contact',  label: 'Electrode Contact',     type: 'electronics', role: 'Interface',  info: '1000 µm²' },
-      { id: 'el_array',    label: 'Microelectrode Array',  type: 'electronics', role: 'Interface',  info: 'MEA' },
-      { id: 'el_ref',      label: 'Reference Electrode',   type: 'electronics', role: 'Interface',  info: 'Ag/AgCl' },
-      { id: 'el_counter',  label: 'Counter Electrode',     type: 'electronics', role: 'Interface',  info: '3-elec' },
-      { id: 'el_dbs',      label: 'DBS Electrode',         type: 'electronics', role: 'Neural',     info: 'Implant' },
-      { id: 'el_eeg',      label: 'EEG Electrode',         type: 'electronics', role: 'Surface',    info: 'Scalp' },
-      { id: 'el_ecg',      label: 'ECG Electrode',         type: 'electronics', role: 'Surface',    info: 'Chest' },
-      { id: 'el_needle',   label: 'Needle Electrode',      type: 'electronics', role: 'Penetrating',info: 'EMG' },
+      { id: 'el_contact',  label: 'Electrode Contact',     type: 'electrode', role: 'Interface',  info: '1000 µm²' },
+      { id: 'el_array',    label: 'Microelectrode Array',  type: 'electrode', role: 'Interface',  info: 'MEA' },
+      { id: 'el_ref',      label: 'Reference Electrode',   type: 'electrode', role: 'Interface',  info: 'Ag/AgCl' },
+      { id: 'el_counter',  label: 'Counter Electrode',     type: 'electrode', role: 'Interface',  info: '3-elec' },
+      { id: 'el_dbs',      label: 'DBS Electrode',         type: 'electrode', role: 'Neural',     info: 'Implant' },
+      { id: 'el_eeg',      label: 'EEG Electrode',         type: 'electrode', role: 'Surface',    info: 'Scalp' },
+      { id: 'el_ecg',      label: 'ECG Electrode',         type: 'electrode', role: 'Surface',    info: 'Chest' },
+      { id: 'el_needle',   label: 'Needle Electrode',      type: 'electrode', role: 'Penetrating',info: 'EMG' },
+      { id: 'el_cuff',     label: 'Nerve Cuff Electrode',  type: 'electrode', role: 'Interface',  info: 'Suture' },
+      { id: 'el_hook',     label: 'Hook Electrode',        type: 'electrode', role: 'Interface',  info: 'Temporary' },
     ]
   },
   {
@@ -86,9 +90,11 @@ const PALETTE_ITEMS = [
     icon: <Zap className="w-4 h-4 text-orange-400" />,
     color: 'text-orange-400',
     items: [
-      { id: 'neu_dbs',     label: 'DBS Probe (Chronic)',   type: 'electronics', role: 'Neural',     info: 'Medtronic-spec' },
-      { id: 'neu_opt',     label: 'Optogenetic LED',      type: 'electronics', role: 'Neural',     info: '470nm Blue' },
-      { id: 'neu_vagus',   label: 'Vagus Nerve Cuff',      type: 'electronics', role: 'Neural',     info: 'Symmetry' },
+      { id: 'neu_dbs',     label: 'DBS Probe (Chronic)',   type: 'neuromodulation', role: 'Neural',     info: 'Medtronic-spec' },
+      { id: 'neu_opt',     label: 'Optogenetic LED',      type: 'neuromodulation', role: 'Neural',     info: '470nm Blue' },
+      { id: 'neu_vagus',   label: 'Vagus Nerve Cuff',      type: 'neuromodulation', role: 'Neural',     info: 'Symmetry' },
+      { id: 'neu_scs',     label: 'Spinal Lead (SCS)',     type: 'neuromodulation', role: 'Neural',     info: 'Medtronic' },
+      { id: 'neu_tens',    label: 'TENS Unit Pad',         type: 'neuromodulation', role: 'Surface',    info: 'Pain' },
     ]
   },
   {
@@ -96,9 +102,11 @@ const PALETTE_ITEMS = [
     icon: <Activity className="w-4 h-4 text-blue-400" />,
     color: 'text-blue-400',
     items: [
-      { id: 'mf_pump',     label: 'Piezo Micro-Pump',      type: 'electronics', role: 'Fluidics',   info: '50 µL/min' },
-      { id: 'mf_valve',    label: 'Micro-Valve',           type: 'electronics', role: 'Fluidics',   info: 'Normally Closed' },
-      { id: 'mf_sensor',   label: 'Flow Rate Sensor',      type: 'electronics', role: 'Fluidics',   info: 'Thermal' },
+      { id: 'mf_pump',     label: 'Piezo Micro-Pump',      type: 'microfluidics', role: 'Fluidics',   info: '50 µL/min' },
+      { id: 'mf_valve',    label: 'Micro-Valve',           type: 'microfluidics', role: 'Fluidics',   info: 'Normally Closed' },
+      { id: 'mf_sensor',   label: 'Flow Rate Sensor',      type: 'microfluidics', role: 'Fluidics',   info: 'Thermal' },
+      { id: 'mf_mixer',    label: 'Passive Mixer',         type: 'microfluidics', role: 'Fluidics',   info: 'Serpentine' },
+      { id: 'mf_reservoir',label: 'Drug Reservoir',        type: 'microfluidics', role: 'Fluidics',   info: '5 mL' },
     ]
   },
   {

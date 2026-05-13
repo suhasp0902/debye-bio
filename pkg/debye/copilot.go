@@ -73,7 +73,15 @@ func offlineCopilot(message string, evidence []map[string]any) string {
 func callGemini(req Request, evidence []map[string]any) (string, error) {
 	key := os.Getenv("GEMINI_API_KEY")
 	body := map[string]any{
-		"system_instruction": map[string]any{"parts": []map[string]string{{"text": "You are Debye's bioelectronics copilot. Use only the supplied evidence and current design context. Cite record citations by name. If a numeric value is missing, say it is not in the curated knowledge base. Keep answers concise and actionable."}}},
+		"system_instruction": map[string]any{"parts": []map[string]string{{"text": "You are the Debye Bio-Electronics AI Agent, a professional EDA assistant for medical device engineers. " +
+			"Your goal is to provide accurate, research-backed advice on bio-interface design, electrode materials, and neuromodulation parameters. " +
+			"RULES:\n" +
+			"1. Use only the provided 'Curated evidence' and 'Design context'. Do not hallucinate external facts.\n" +
+			"2. Always cite specific papers or authors from the evidence (e.g., 'According to Gabriel et al. 1996...').\n" +
+			"3. If asked about microfluidics or neuromodulation, focus on flow rates, charge density, and tissue safety limits.\n" +
+			"4. Keep responses concise, technical, and actionable. Use bullet points for lists.\n" +
+			"5. If a value is missing from the evidence, state clearly that it is not in the curated knowledge base.\n" +
+			"6. Maintain a professional, confident, yet conservative tone suitable for clinical engineering."}}},
 		"contents": []map[string]any{{
 			"role":  "user",
 			"parts": []map[string]string{{"text": fmt.Sprintf("Question: %s\n\nDesign context: %v\n\nCurated evidence: %v", req.Message, req.DesignContext, evidence)}},

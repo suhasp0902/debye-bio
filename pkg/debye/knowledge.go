@@ -29,6 +29,8 @@ var Tissues = map[string]Tissue{
 	"bone":             {Key: "bone", Name: "Bone (Cortical)", Conductivity: 0.006, Permittivity: 500, ColeAlpha: 0.55, Tau: 15e-3, R0: 8000, RInf: 1200, NoiseUV: 0.2, MotionUV: 0.3, Application: []string{"Fracture Healing", "Implant Osseointegration"}, Citation: "Gabriel et al. 1996 PMB; Sierpowska et al. 2006"},
 	"csf":              {Key: "csf", Name: "Cerebrospinal Fluid", Conductivity: 1.79, Permittivity: 109, ColeAlpha: 0.97, Tau: 0.1e-3, R0: 55, RInf: 52, NoiseUV: 0.3, MotionUV: 0.2, Application: []string{"Intracranial Recording", "DBS"}, Citation: "Gabriel et al. 1996 PMB"},
 	"fat":              {Key: "fat", Name: "Adipose Tissue", Conductivity: 0.04, Permittivity: 900, ColeAlpha: 0.58, Tau: 12e-3, R0: 3500, RInf: 700, NoiseUV: 0.4, MotionUV: 0.7, Application: []string{"Body Composition", "Wearable Sensing"}, Citation: "Gabriel et al. 1996 PMB; Kyle et al. 2004"},
+	"vagus_nerve":     {Key: "vagus_nerve", Name: "Vagus Nerve", Conductivity: 0.12, Permittivity: 2800, ColeAlpha: 0.62, Tau: 8e-3, R0: 1300, RInf: 500, NoiseUV: 1.5, MotionUV: 0.5, Application: []string{"VNS", "Neuromodulation"}, Citation: "Gabriel et al. 1996"},
+	"spinal_cord":     {Key: "spinal_cord", Name: "Spinal Cord (Dorsal)", Conductivity: 0.22, Permittivity: 1800, ColeAlpha: 0.66, Tau: 6e-3, R0: 950, RInf: 420, NoiseUV: 4.2, MotionUV: 0.3, Application: []string{"SCS", "Pain Management"}, Citation: "Gabriel et al. 1996"},
 }
 
 var Materials = map[string]Material{
@@ -155,6 +157,10 @@ func NormalizeDesign(req Request) NormalizedDesign {
 		if strings.Contains(label, "pulse") || strings.Contains(label, "stimulat") || strings.Contains(label, "pacing") {
 			design.StimCurrentMA = firstPositive(numberValue(node.Data["currentMA"]), parseLeadingNumber(lowerString(node.Data["current"])), 2)
 			design.PulseWidthMS = firstPositive(numberValue(node.Data["pulseWidthMS"]), parseLeadingNumber(lowerString(node.Data["pulseWidth"])), 1)
+		}
+		if strings.Contains(label, "pump") || strings.Contains(label, "fluidic") || strings.Contains(label, "flow") {
+			design.FlowRateULMin = firstPositive(numberValue(node.Data["flowRate"]), numberValue(node.Data["flowRateULMin"]), 5)
+			design.ChannelWidthUM = firstPositive(numberValue(node.Data["channelWidth"]), numberValue(node.Data["channelWidthUM"]), 100)
 		}
 	}
 
