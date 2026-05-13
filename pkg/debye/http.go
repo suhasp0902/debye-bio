@@ -3,7 +3,6 @@ package debye
 import (
 	"encoding/json"
 	"net/http"
-	"strings"
 )
 
 func DecodeRequest(r *http.Request) (Request, error) {
