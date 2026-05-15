@@ -7,12 +7,14 @@ import {
   LogOut,
   Maximize,
   MessageSquare,
+  Moon,
   PanelRight,
   Play,
   Save,
   Settings,
   Shield,
   Sparkles,
+  Sun,
   TerminalSquare,
   UserRound,
   ZoomIn,
@@ -55,6 +57,8 @@ export default function Topbar({
   setShowCopilot,
   showBottomPanel,
   setShowBottomPanel,
+  darkMode,
+  setDarkMode,
 }) {
   const { zoomIn, zoomOut, fitView } = useReactFlow();
   const { isConfigured, user, signOut } = useAuth();
@@ -248,20 +252,13 @@ export default function Topbar({
           <Maximize className="w-4 h-4" />
         </button>
 
-        <div className="designer-toolbar-spacer" />
+        <div className="designer-toolbar-rule" />
+        
+        <ToggleButton active={darkMode} onClick={() => setDarkMode(!darkMode)} title="Toggle Dark Mode">
+          {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+        </ToggleButton>
 
-        {user ? (
-          <button className="designer-user-pill" onClick={() => signOut()} title="Sign out" type="button">
-            <UserRound className="w-3.5 h-3.5" />
-            <span>{user.email}</span>
-            <LogOut className="w-3.5 h-3.5" />
-          </button>
-        ) : (
-          <a className="designer-user-pill" href="/#access">
-            <UserRound className="w-3.5 h-3.5" />
-            <span>Sign in</span>
-          </a>
-        )}
+        <div className="designer-toolbar-rule" />
 
         <button className="designer-icon-button" title="Settings" type="button">
           <Settings className="w-4 h-4" />

@@ -1,9 +1,9 @@
 import { Handle, Position, NodeResizer } from '@xyflow/react';
 import { X } from 'lucide-react';
 
-export default function BaseNode({ id, data, selected, children, type, color }) {
+export default function BaseNode({ id, data, selected, children, type, color, categoryClass }) {
   return (
-    <div className={`glass-node bg-opacity-10 border rounded-[12px] min-w-[160px] min-h-[90px] overflow-visible shadow-2xl transition-all duration-300 ${selected ? 'glass-node-selected' : 'border-opacity-30'} group relative`} style={{ backgroundColor: `${color}15`, borderColor: selected ? color : `${color}40` }}>
+    <div className={`glass-node ${categoryClass} ${selected ? 'glass-node-selected' : ''} group relative`} style={{ minWidth: '160px', minHeight: '90px' }}>
       <NodeResizer 
         minWidth={160} 
         minHeight={90} 
@@ -13,8 +13,8 @@ export default function BaseNode({ id, data, selected, children, type, color }) 
       />
       
       {/* Header */}
-      <div className="backdrop-blur-md px-2 py-1.5 border-b border-white/10 rounded-t-[12px] flex items-center justify-between" style={{ backgroundColor: `${color}30` }}>
-        <span className="text-[9px] font-black tracking-widest uppercase" style={{ color: color }}>{type}</span>
+      <div className="backdrop-blur-md px-2 py-1.5 border-b border-white/10 rounded-t-[12px] flex items-center justify-between bg-white/5">
+        <span className="text-[9px] font-black tracking-widest uppercase opacity-80">{type}</span>
         {selected && (
           <button 
             onClick={(e) => {
@@ -30,15 +30,15 @@ export default function BaseNode({ id, data, selected, children, type, color }) 
 
       {/* Content */}
       <div className="p-3">
-        <div className="text-white text-[13px] font-bold mb-1.5 leading-tight">{data.label}</div>
+        <div className="text-inherit text-[13px] font-bold mb-1.5 leading-tight">{data.label}</div>
         {children}
       </div>
 
       {/* 4 Handles - Universal connectivity */}
-      <Handle type="source" position={Position.Top} id="t" className="node-handle" style={{ backgroundColor: color }} />
-      <Handle type="source" position={Position.Bottom} id="b" className="node-handle" style={{ backgroundColor: color }} />
-      <Handle type="source" position={Position.Left} id="l" className="node-handle" style={{ backgroundColor: color }} />
-      <Handle type="source" position={Position.Right} id="r" className="node-handle" style={{ backgroundColor: color }} />
+      <Handle type="source" position={Position.Top} id="t" className="node-handle" />
+      <Handle type="source" position={Position.Bottom} id="b" className="node-handle" />
+      <Handle type="source" position={Position.Left} id="l" className="node-handle" />
+      <Handle type="source" position={Position.Right} id="r" className="node-handle" />
     </div>
   );
 }

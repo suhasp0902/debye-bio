@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=DM+Mono:wght@400;500&display=swap');
-
 .designer-shell {
   --designer-ink: #06253a;
   --designer-muted: #4d7183;
@@ -19,8 +17,133 @@
     linear-gradient(180deg, #e6fbff 0%, #f8fdff 42%, #fff6d7 100%) !important;
   color: var(--designer-ink) !important;
   font-family: 'Bricolage Grotesque', system-ui, sans-serif !important;
+  transition: background 0.4s ease, color 0.4s ease;
 }
 
+/* Dark Mode Overrides */
+.designer-shell.dark {
+  --designer-ink: #f8fdff;
+  --designer-muted: #94a3b8;
+  --designer-blue: #38bdf8;
+  --designer-blue-deep: #7dd3fc;
+  --designer-cyan: #22d3ee;
+  --designer-cyan-soft: #083344;
+  --designer-gold: #fbbf24;
+  --designer-paper: #020617;
+  --designer-panel: rgba(15, 23, 42, 0.76);
+  --designer-panel-strong: rgba(15, 23, 42, 0.92);
+  --designer-line: rgba(255, 255, 255, 0.12);
+  --designer-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  background:
+    radial-gradient(circle at 18% 10%, rgba(37, 201, 220, 0.15), transparent 28%),
+    radial-gradient(circle at 92% 3%, rgba(245, 184, 54, 0.1), transparent 30%),
+    linear-gradient(180deg, #020617 0%, #0f172a 42%, #0c0a09 100%) !important;
+}
+
+.designer-shell.dark .designer-topbar {
+  background: rgba(15, 23, 42, 0.82);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+}
+
+.designer-shell.dark .designer-toolbar {
+  background: rgba(15, 23, 42, 0.68) !important;
+}
+
+.designer-shell.dark .designer-dropdown {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(8, 51, 68, 0.94));
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.5);
+}
+
+.designer-shell.dark .designer-project-pill {
+  background: rgba(30, 41, 59, 0.8);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.designer-shell.dark .react-flow {
+  background: linear-gradient(135deg, rgba(8, 51, 68, 0.4), rgba(15, 23, 42, 0.6));
+}
+
+.designer-shell.dark .react-flow__background pattern line {
+  stroke: rgba(255, 255, 255, 0.05);
+}
+
+.designer-shell.dark input,
+.designer-shell.dark select,
+.designer-shell.dark textarea {
+  background: rgba(30, 41, 59, 0.84) !important;
+}
+
+/* Glassmorphism Nodes */
+.designer-shell .glass-node {
+  border-radius: 12px !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid var(--designer-line) !important;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
+}
+
+/* Node Categories */
+.node-biology {
+  background: rgba(22, 166, 106, 0.15) !important;
+  border-color: rgba(22, 166, 106, 0.4) !important;
+  box-shadow: 0 12px 24px rgba(22, 166, 106, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+.node-electrode {
+  background: rgba(11, 103, 178, 0.15) !important;
+  border-color: rgba(11, 103, 178, 0.4) !important;
+  box-shadow: 0 12px 24px rgba(11, 103, 178, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+.node-material {
+  background: rgba(245, 184, 54, 0.15) !important;
+  border-color: rgba(245, 184, 54, 0.4) !important;
+  box-shadow: 0 12px 24px rgba(245, 184, 54, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+.node-neuro {
+  background: rgba(124, 58, 237, 0.15) !important;
+  border-color: rgba(124, 58, 237, 0.4) !important;
+  box-shadow: 0 12px 24px rgba(124, 58, 237, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+.node-fluidics {
+  background: rgba(219, 39, 119, 0.15) !important;
+  border-color: rgba(219, 39, 119, 0.4) !important;
+  box-shadow: 0 12px 24px rgba(219, 39, 119, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+.node-electronics {
+  background: rgba(153, 27, 27, 0.15) !important;
+  border-color: rgba(153, 27, 27, 0.4) !important;
+  box-shadow: 0 12px 24px rgba(153, 27, 27, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+.node-biochemistry {
+  background: rgba(79, 70, 229, 0.15) !important;
+  border-color: rgba(79, 70, 229, 0.4) !important;
+  box-shadow: 0 12px 24px rgba(79, 70, 229, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+.designer-shell.dark .glass-node {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+.designer-shell .glass-node:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.designer-shell .glass-node-selected {
+  border-color: var(--designer-cyan) !important;
+  border-width: 2px !important;
+  box-shadow: 0 18px 34px rgba(37, 201, 220, 0.3), 0 0 0 4px rgba(37, 201, 220, 0.14) !important;
+}
+
+.designer-shell .node-handle {
+  width: 8px !important;
+  height: 8px !important;
+  background: var(--designer-cyan) !important;
+  border: 2px solid #fff !important;
+}
+
+.designer-shell.dark .node-handle {
+  border-color: #0f172a !important;
+}
+
+/* Original rest of the file... */
 .designer-shell .bg-background,
 .designer-shell .bg-surface,
 .designer-shell .bg-surface-raised {
@@ -369,17 +492,6 @@
 
 .designer-shell .react-flow__minimap-mask {
   fill: rgba(223, 249, 255, 0.72) !important;
-}
-
-.designer-shell .glass-node {
-  border-radius: 8px !important;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.88), rgba(224, 248, 252, 0.72)) !important;
-  box-shadow: 0 16px 28px rgba(7, 70, 120, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
-}
-
-.designer-shell .glass-node-selected {
-  box-shadow: 0 18px 34px rgba(11, 103, 178, 0.24), 0 0 0 4px rgba(37, 201, 220, 0.14) !important;
 }
 
 .designer-shell .node-handle {

@@ -36,17 +36,18 @@ RULES:
 
 const fetchWithRetry = async (url, options, maxRetries = 3, initialDelay = 1000) => {
   let retries = 0;
+  let lastResponse;
   while (retries < maxRetries) {
     try {
-      const response = await fetch(url, options);
-      if (response.status === 429) {
+      lastResponse = await fetch(url, options);
+      if (lastResponse.status === 429) {
         const delay = initialDelay * Math.pow(2, retries);
         console.warn(`Gemini rate limit hit (429). Retrying in ${delay}ms...`);
         await new Promise(resolve => setTimeout(resolve, delay));
         retries++;
         continue;
       }
-      return response;
+      return lastResponse;
     } catch (error) {
       if (retries === maxRetries - 1) throw error;
       const delay = initialDelay * Math.pow(2, retries);
@@ -54,6 +55,7 @@ const fetchWithRetry = async (url, options, maxRetries = 3, initialDelay = 1000)
       retries++;
     }
   }
+  return lastResponse;
 };
 
 export async function askCopilot(message, designContext, conversationHistory = []) {

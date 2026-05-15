@@ -38,6 +38,7 @@ export default function Designer() {
   const [showBottomPanel, setShowBottomPanel] = useState(true);
   const [bottomPanelHeight, setBottomPanelHeight] = useState(320);
   const [copilotWidth, setCopilotWidth] = useState(320);
+  const [darkMode, setDarkMode] = useState(false);
 
   const fileInputRef = useRef(null);
 
@@ -345,7 +346,7 @@ export default function Designer() {
   };
 
   return (
-    <div className="designer-shell h-screen w-screen flex flex-col bg-background text-text-primary overflow-hidden font-sans">
+    <div className={`designer-shell h-screen w-screen flex flex-col bg-background text-text-primary overflow-hidden font-sans ${darkMode ? 'dark' : ''}`}>
       <input 
         type="file" 
         accept=".dsn,.json" 
@@ -380,6 +381,8 @@ export default function Designer() {
         setShowCopilot={setShowCopilot}
         showBottomPanel={showBottomPanel}
         setShowBottomPanel={setShowBottomPanel}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
       />
       
       <div className="designer-workspace flex-1 flex min-h-0 relative">
