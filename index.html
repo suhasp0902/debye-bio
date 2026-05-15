@@ -4,10 +4,197 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>debye</title>
+    <meta
+      name="description"
+      content="Debye Bio is electronic design software for bio-electronic interfaces, with tissue-aware simulation, noise budgets, design rule checks, AI copilot support, and regulatory exports."
+    />
+    <meta name="theme-color" content="#dff9ff" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Debye Bio - EDA Software for Living Tissue" />
+    <meta
+      property="og:description"
+      content="Design software that understands living tissue. Model electrodes, tissues, biological noise, DRC, and regulatory outputs before fabrication."
+    />
+    <meta property="og:url" content="/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Debye Bio - EDA Software for Living Tissue" />
+    <meta
+      name="twitter:description"
+      content="The first electronic design platform built for bio-electronic interfaces."
+    />
+    <title>Debye Bio - EDA Software for Living Tissue</title>
+    <style>
+      #root:has(.static-landing-shell) {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #dff9ff, #f8fdff 45%, #fff0b7);
+        color: #06253a;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .static-landing-shell {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 64px 20px;
+      }
+
+      .static-landing-shell nav,
+      .static-landing-shell footer {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        justify-content: space-between;
+      }
+
+      .static-landing-shell nav a,
+      .static-landing-shell footer a {
+        color: #074678;
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      .static-landing-shell section {
+        padding: 52px 0;
+        border-bottom: 1px solid rgba(6, 37, 58, 0.14);
+      }
+
+      .static-landing-shell h1,
+      .static-landing-shell h2 {
+        max-width: 760px;
+        margin: 0 0 18px;
+        line-height: 1;
+      }
+
+      .static-landing-shell h1 {
+        font-size: 56px;
+      }
+
+      .static-landing-shell h2 {
+        font-size: 38px;
+      }
+
+      .static-landing-shell p,
+      .static-landing-shell li {
+        color: #43677a;
+        font-size: 19px;
+        line-height: 1.65;
+      }
+    </style>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Debye Bio",
+        "applicationCategory": "EngineeringApplication",
+        "operatingSystem": "Web",
+        "description": "Electronic design software for bio-electronic interfaces with tissue-aware simulation, noise budgets, design rule checks, AI copilot support, and regulatory exports."
+      }
+    </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <main class="static-landing-shell">
+        <nav aria-label="Landing page navigation">
+          <a href="/">DEBYE BIO</a>
+          <a href="#problem">Problem</a>
+          <a href="#solution">Solution</a>
+          <a href="#simulation">Simulation</a>
+          <a href="#platform">Applications</a>
+          <a href="/designer">Designer</a>
+        </nav>
+
+        <section id="hero">
+          <p>Debye Bio</p>
+          <h1>Design software that understands living tissue.</h1>
+          <p>
+            The first electronic design platform built for bio-electronic interfaces. Every electrode,
+            every tissue, every noise source - modelled natively.
+          </p>
+          <p>EDA for Bioelectronics. Tissue-aware. Simulation-first.</p>
+          <p><a href="/designer">Launch EDA Designer</a></p>
+        </section>
+
+        <section id="problem">
+          <p>02 - The Problem</p>
+          <h2>Two worlds. Zero shared language.</h2>
+          <p>
+            Every team building a medical device that touches the human body needs two types of expertise
+            that no design tool currently bridges.
+          </p>
+          <h3>[Biology] - Domain Knowledge</h3>
+          <ul>
+            <li>How tissue conducts electricity across frequencies</li>
+            <li>Which materials the immune system accepts or rejects</li>
+            <li>What biological noise looks like versus real signal</li>
+            <li>How cells respond to electrical stimulation over time</li>
+          </ul>
+          <h3>[Electronics] - Engineering Knowledge</h3>
+          <ul>
+            <li>How to design sensors for tiny electrical signals</li>
+            <li>How electrode geometry affects impedance</li>
+            <li>How to calculate noise floors mathematically</li>
+            <li>How to route a design to a fabrication factory</li>
+          </ul>
+          <p>Cost per failed iteration - $500K - $2M | Avg cycle - 6-12 weeks</p>
+        </section>
+
+        <section id="solution">
+          <p>03 - The Solution</p>
+          <h2>What if the software already knew the biology?</h2>
+          <p>
+            Debye encodes biological knowledge natively - every tissue model, every electrode material,
+            every noise source. Place an electrode. The tool already knows what tissue it is touching.
+          </p>
+          <ul>
+            <li>Cell &amp; Tissue Library - electrical properties of every major tissue pre-loaded.</li>
+            <li>Electrode Interface Model - Randles circuit + Cole-Cole model.</li>
+            <li>Noise Budget Engine - thermal, 1/f flicker, motion artifact, shot noise, biological background.</li>
+            <li>Design Rule Checker - biological, electrical, and biocompatibility violations flagged automatically.</li>
+            <li>AI Copilot - every response retrieved from a curated biological knowledge base.</li>
+            <li>Regulatory Export - ISO 10993, FDA, and EU MDR documentation drafted from your design.</li>
+          </ul>
+        </section>
+
+        <section id="simulation">
+          <p>04 - Live Simulation</p>
+          <h2>Noise budget. Before you build anything.</h2>
+          <p>Five noise sources. Quantified individually. Every design, every biological environment.</p>
+          <ul>
+            <li>Thermal - 2.1 uVrms</li>
+            <li>Amplifier 1/f - 1.6 uVrms</li>
+            <li>Motion Artifact - 1.2 uVrms</li>
+          </ul>
+        </section>
+
+        <section id="drc">
+          <p>05 - Design Rule Check</p>
+          <h2>Spell-check for medical devices. Instant. Automatic.</h2>
+          <p>BIO-001: Electrode impedance out of range. 2.1 MOhm at 1 kHz exceeds optimal range for glucose sensing. Increase area to &gt;= 2000 um2.</p>
+          <p>PASS: 8 checks passed. ISO 10993 compliant. Charge density within safe limits. Biocompatibility verified.</p>
+        </section>
+
+        <section id="platform">
+          <p>06 - Applications</p>
+          <h2>Every device. One platform.</h2>
+          <h3>Continuous Glucose Monitor</h3>
+          <p>Subcutaneous electrode coated with enzyme layer. Fouling resistance over wear period validated before fabrication.</p>
+          <h3>Cardiac Arrhythmia Patch</h3>
+          <p>Multi-layer signal propagation through chest tissue modelled. Motion artifact dominant noise source quantified.</p>
+          <h3>Spinal Cord Stimulator</h3>
+          <p>Anisotropic white matter conductivity modelled. Volume of tissue activated predicted per parameter set.</p>
+        </section>
+
+        <section id="cta-section">
+          <p>Debye EDA Suite</p>
+          <h2>The teams building the next 20 years of medtech should not be designing blind.</h2>
+          <p><a href="/designer">Launch Designer Demo</a></p>
+        </section>
+
+        <footer>
+          <a href="/">Debye</a>
+          <p>&copy; 2026 Debye Bio. EDA Software for Living Tissue.</p>
+        </footer>
+      </main>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
