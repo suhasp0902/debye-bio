@@ -9,6 +9,7 @@ import Toast from '../components/Toast';
 import AiPromptModal from '../components/AiPromptModal';
 import { SCENARIOS } from '../data/scenarios';
 import { simulateDesign, runDesignRules, generateDesignBackend } from '../lib/backend';
+import '../Designer.css';
 
 export default function Designer() {
   const [scenarioId, setScenarioId] = useState(null); // null means blank canvas
@@ -55,16 +56,16 @@ export default function Designer() {
 
   const processEdges = (rawEdges) => {
     return rawEdges.map(edge => {
-      let stroke = '#3A3A4A'; 
-      if (edge.data?.type === 'bio') stroke = '#22D3EE';
-      else if (edge.data?.type === 'elec') stroke = '#6366F1';
-      else if (edge.data?.type === 'mixed') stroke = '#818CF8'; 
+      let stroke = '#7ba9bc';
+      if (edge.data?.type === 'bio') stroke = '#25c9dc';
+      else if (edge.data?.type === 'elec') stroke = '#0b67b2';
+      else if (edge.data?.type === 'mixed') stroke = '#f5b836';
       
       return {
         ...edge,
         style: { ...edge.style, stroke, strokeWidth: 2 },
-        labelStyle: { fill: '#F1F5F9', fontWeight: 'bold' },
-        labelBgStyle: { fill: '#1A1A24', fillOpacity: 0.8 },
+        labelStyle: { fill: '#06253a', fontWeight: 'bold' },
+        labelBgStyle: { fill: '#ffffff', fillOpacity: 0.86 },
       };
     });
   };
@@ -344,7 +345,7 @@ export default function Designer() {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-background text-text-primary overflow-hidden font-sans">
+    <div className="designer-shell h-screen w-screen flex flex-col bg-background text-text-primary overflow-hidden font-sans">
       <input 
         type="file" 
         accept=".dsn,.json" 
@@ -381,10 +382,10 @@ export default function Designer() {
         setShowBottomPanel={setShowBottomPanel}
       />
       
-      <div className="flex-1 flex min-h-0 relative">
+      <div className="designer-workspace flex-1 flex min-h-0 relative">
         <PaletteSidebar />
         
-        <div className="flex-1 flex flex-col relative min-w-0 border-r border-border">
+        <div className="designer-canvas-column flex-1 flex flex-col relative min-w-0 border-r border-border">
             <Canvas 
               nodes={nodes}
               setNodes={setNodes}

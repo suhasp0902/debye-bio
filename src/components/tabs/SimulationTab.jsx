@@ -69,14 +69,14 @@ export default function SimulationTab({ data, isRunning }) {
           <div className="flex-1 min-h-0">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={eisData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2A2A3A" />
-                <XAxis dataKey="frequency" scale="log" domain={['dataMin', 'dataMax']} type="number" stroke="#475569" fontSize={10} tickFormatter={(val) => Number(val).toExponential(0)} />
-                <YAxis yAxisId="left" scale="log" domain={['dataMin', 'dataMax']} stroke="#6366F1" fontSize={10} tickFormatter={(val) => Number(val).toExponential(0)} />
-                <YAxis yAxisId="right" orientation="right" domain={[-90, 0]} stroke="#22D3EE" fontSize={10} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(6,37,58,0.12)" />
+                <XAxis dataKey="frequency" scale="log" domain={['dataMin', 'dataMax']} type="number" stroke="#4d7183" fontSize={10} tickFormatter={(val) => Number(val).toExponential(0)} />
+                <YAxis yAxisId="left" scale="log" domain={['dataMin', 'dataMax']} stroke="#0b67b2" fontSize={10} tickFormatter={(val) => Number(val).toExponential(0)} />
+                <YAxis yAxisId="right" orientation="right" domain={[-90, 0]} stroke="#25c9dc" fontSize={10} />
                 <RechartsTooltip content={<EISTooltip />} />
-                <ReferenceLine x={1000} stroke="#94A3B8" strokeDasharray="3 3" yAxisId="left" label={{ position: 'top', value: `1 kHz: ${impedance1kHz}`, fill: '#94A3B8', fontSize: 10 }} />
-                <Line yAxisId="left" type="monotone" dataKey="magnitude" stroke="#6366F1" strokeWidth={2} dot={false} isAnimationActive animationDuration={1000} />
-                <Line yAxisId="right" type="monotone" dataKey="phase" stroke="#22D3EE" strokeWidth={2} dot={false} isAnimationActive animationDuration={1000} />
+                <ReferenceLine x={1000} stroke="#f5b836" strokeDasharray="3 3" yAxisId="left" label={{ position: 'top', value: `1 kHz: ${impedance1kHz}`, fill: '#074678', fontSize: 10 }} />
+                <Line yAxisId="left" type="monotone" dataKey="magnitude" stroke="#0b67b2" strokeWidth={2} dot={false} isAnimationActive animationDuration={1000} />
+                <Line yAxisId="right" type="monotone" dataKey="phase" stroke="#25c9dc" strokeWidth={2} dot={false} isAnimationActive animationDuration={1000} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -87,14 +87,14 @@ export default function SimulationTab({ data, isRunning }) {
           <div className="flex-1 min-h-0">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart layout="vertical" data={noiseSources} margin={{ top: 5, right: 30, left: 30, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2A2A3A" horizontal={false} />
-                <XAxis type="number" stroke="#475569" fontSize={10} />
-                <YAxis dataKey="name" type="category" stroke="#94A3B8" fontSize={10} width={80} />
-                <RechartsTooltip content={<NoiseTooltip />} cursor={{ fill: '#1A1A24' }} />
-                <ReferenceLine x={noiseTotal} stroke="#6366F1" strokeDasharray="3 3" label={{ position: 'top', value: `Total: ${noiseTotal} uV`, fill: '#6366F1', fontSize: 10 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(6,37,58,0.12)" horizontal={false} />
+                <XAxis type="number" stroke="#4d7183" fontSize={10} />
+                <YAxis dataKey="name" type="category" stroke="#4d7183" fontSize={10} width={80} />
+                <RechartsTooltip content={<NoiseTooltip />} cursor={{ fill: 'rgba(37,201,220,0.08)' }} />
+                <ReferenceLine x={noiseTotal} stroke="#f5b836" strokeDasharray="3 3" label={{ position: 'top', value: `Total: ${noiseTotal} uV`, fill: '#074678', fontSize: 10 }} />
                 <Bar dataKey="value" isAnimationActive animationDuration={1000} barSize={12}>
                   {noiseSources.map((entry, index) => (
-                    <Cell key={entry.name} fill={`hsl(238, 80%, ${60 - index * 5}%)`} />
+                    <Cell key={entry.name} fill={index % 2 === 0 ? '#0b67b2' : '#25c9dc'} />
                   ))}
                 </Bar>
               </BarChart>
@@ -107,10 +107,10 @@ export default function SimulationTab({ data, isRunning }) {
           <div className="flex-1 min-h-0">
             <ResponsiveContainer width="100%" height="100%">
               <ScatterChart margin={{ top: 5, right: 10, left: 5, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2A2A3A" />
-                <XAxis dataKey="zReal" type="number" stroke="#475569" fontSize={10} tickFormatter={(val) => Number(val).toExponential(0)} />
-                <YAxis dataKey="negZImag" type="number" stroke="#22D3EE" fontSize={10} tickFormatter={(val) => Number(val).toExponential(0)} />
-                <Scatter data={nyquistData || []} fill="#22D3EE" line lineType="joint" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(6,37,58,0.12)" />
+                <XAxis dataKey="zReal" type="number" stroke="#4d7183" fontSize={10} tickFormatter={(val) => Number(val).toExponential(0)} />
+                <YAxis dataKey="negZImag" type="number" stroke="#25c9dc" fontSize={10} tickFormatter={(val) => Number(val).toExponential(0)} />
+                <Scatter data={nyquistData || []} fill="#25c9dc" line lineType="joint" />
               </ScatterChart>
             </ResponsiveContainer>
           </div>
@@ -123,12 +123,12 @@ export default function SimulationTab({ data, isRunning }) {
           <div className="flex-1 min-h-0">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={timeData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2A2A3A" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(6,37,58,0.12)" />
                 <XAxis dataKey="time" hide />
-                <YAxis stroke="#475569" fontSize={10} tickFormatter={(val) => `${val}uV`} />
-                <RechartsTooltip contentStyle={{ backgroundColor: '#111118', borderColor: '#2A2A3A', fontSize: '10px' }} />
-                <Line type="monotone" dataKey="voltage" stroke="#22D3EE" strokeWidth={1.5} dot={false} isAnimationActive animationDuration={1000} name="Signal + Noise" />
-                <Line type="monotone" dataKey="signal" stroke="#6366F1" strokeWidth={1} strokeDasharray="4 4" dot={false} isAnimationActive={false} name="Ideal Signal" />
+                <YAxis stroke="#4d7183" fontSize={10} tickFormatter={(val) => `${val}uV`} />
+                <RechartsTooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: 'rgba(6,37,58,0.13)', fontSize: '10px' }} />
+                <Line type="monotone" dataKey="voltage" stroke="#25c9dc" strokeWidth={1.5} dot={false} isAnimationActive animationDuration={1000} name="Signal + Noise" />
+                <Line type="monotone" dataKey="signal" stroke="#0b67b2" strokeWidth={1} strokeDasharray="4 4" dot={false} isAnimationActive={false} name="Ideal Signal" />
               </LineChart>
             </ResponsiveContainer>
           </div>

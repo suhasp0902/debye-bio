@@ -21,20 +21,6 @@ export default function CopilotPanel({
   
   const isResizing = useRef(false);
 
-  const startResizing = useCallback((e) => {
-    isResizing.current = true;
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', stopResizing);
-    document.body.style.cursor = 'col-resize';
-  }, []);
-
-  const stopResizing = useCallback(() => {
-    isResizing.current = false;
-    document.removeEventListener('mousemove', handleMouseMove);
-    document.removeEventListener('mouseup', stopResizing);
-    document.body.style.cursor = 'default';
-  }, []);
-
   const handleMouseMove = useCallback((e) => {
     if (!isResizing.current) return;
     const newWidth = window.innerWidth - e.clientX;
@@ -42,6 +28,19 @@ export default function CopilotPanel({
       setWidth(newWidth);
     }
   }, [setWidth]);
+
+  const stopResizing = useCallback(() => {
+    isResizing.current = false;
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.body.style.cursor = 'default';
+  }, [handleMouseMove]);
+
+  const startResizing = useCallback(() => {
+    isResizing.current = true;
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', stopResizing, { once: true });
+    document.body.style.cursor = 'col-resize';
+  }, [handleMouseMove, stopResizing]);
 
   const suggestions = (() => {
     const newSuggestions = [];

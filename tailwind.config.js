@@ -7,34 +7,34 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#0A0A0F',
+        background: '#E6FBFF',
         surface: {
-          DEFAULT: '#111118',
-          raised: '#1A1A24',
+          DEFAULT: '#F8FDFF',
+          raised: '#E8F7FB',
         },
         border: {
-          DEFAULT: '#2A2A3A',
-          light: '#3A3A4A',
+          DEFAULT: 'rgba(6,37,58,0.13)',
+          light: 'rgba(6,37,58,0.22)',
         },
         accent: {
-          primary: '#6366F1',
-          secondary: '#22D3EE',
+          primary: '#0B67B2',
+          secondary: '#25C9DC',
           success: '#10B981',
-          warning: '#F59E0B',
+          warning: '#F5B836',
           error: '#EF4444',
         },
         text: {
-          primary: '#F1F5F9',
-          secondary: '#94A3B8',
-          muted: '#475569',
+          primary: '#06253A',
+          secondary: '#43677A',
+          muted: '#6E8A98',
         },
         node: {
-          bio: '#0E4A3A',
-          bioBorder: '#22D3EE',
-          elec: '#1E1B4B',
-          elecBorder: '#6366F1',
-          material: '#2D1B00',
-          materialBorder: '#F59E0B',
+          bio: '#DFF9FF',
+          bioBorder: '#25C9DC',
+          elec: '#DCEEFF',
+          elecBorder: '#0B67B2',
+          material: '#FFF0B7',
+          materialBorder: '#F5B836',
           biochem: '#064E3B',
           biochemBorder: '#10B981',
         }

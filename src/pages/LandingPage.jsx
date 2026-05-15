@@ -5,6 +5,7 @@ import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
 import * as THREE from 'three';
 import { Link } from 'react-router-dom';
+import AuthPanel from '../components/AuthPanel';
 import '../LandingPage.css';
 
 const features = [
@@ -263,6 +264,7 @@ export default function LandingPage() {
           <a href="#solution">Solution</a>
           <a href="#simulation">Simulation</a>
           <a href="#platform">Applications</a>
+          <a href="#access">Access</a>
           <Link to="/designer">Designer</Link>
         </div>
       </nav>
@@ -453,6 +455,25 @@ export default function LandingPage() {
                 </article>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section id="access" className="landing-section access-section">
+          <div className="section-shell access-shell">
+            <div>
+              <div className="eyebrow reveal">07 - Access</div>
+              <h2 className="headline-l reveal">Bring the team into one secure workspace.</h2>
+              <p className="body-text reveal">
+                Create a real account, return to the same session, and give the product team a clean
+                path to understand signups, active users, and private beta demand.
+              </p>
+              <div className="access-proof reveal">
+                <span>Supabase Auth</span>
+                <span>Email sessions</span>
+                <span>Dashboard metrics</span>
+              </div>
+            </div>
+            <AuthPanel />
           </div>
         </section>
 

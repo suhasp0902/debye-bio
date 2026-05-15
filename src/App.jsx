@@ -1,15 +1,25 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import React from 'react';
 import LandingPage from './pages/LandingPage';
 import Designer from './pages/Designer';
+import AuthProvider from './components/AuthProvider';
+import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/designer" element={<Designer />} />
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route
+            path="/designer"
+            element={
+              <ProtectedRoute>
+                <Designer />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }

@@ -21,13 +21,13 @@ const nodeTypes = {
 };
 
 const NODE_COLORS = {
-  biology: '#14B8A6',
-  electronics: '#6366F1',
-  material: '#FBBF24',
-  biochemistry: '#10B981',
-  electrode: '#06B6D4',
-  neuromodulation: '#7F1D1D',
-  microfluidics: '#3B82F6',
+  biology: '#25c9dc',
+  electronics: '#0b67b2',
+  material: '#f5b836',
+  biochemistry: '#16a66a',
+  electrode: '#26a9d4',
+  neuromodulation: '#f5b836',
+  microfluidics: '#2fb8e7',
 };
 
 // Custom edge with X button for disconnect
@@ -35,22 +35,22 @@ function DeletableEdge({ id, sourceX, sourceY, targetX, targetY, sourcePosition,
   const [edgePath, labelX, labelY] = getBezierPath({ sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition });
   
   const edgeColor = (() => {
-    if (data?.type === 'bio') return '#22D3EE';
-    if (data?.type === 'elec') return '#6366F1';
-    return '#818CF8';
+    if (data?.type === 'bio') return '#25c9dc';
+    if (data?.type === 'elec') return '#0b67b2';
+    return '#f5b836';
   })();
 
   return (
     <>
-      <BaseEdge 
-        path={edgePath} 
-        markerEnd={markerEnd} 
-        style={{ 
-          ...style, 
-          stroke: selected ? '#f43f5e' : edgeColor, 
+      <BaseEdge
+        path={edgePath}
+        markerEnd={markerEnd}
+        style={{
+          ...style,
+          stroke: selected ? '#f5b836' : edgeColor,
           strokeWidth: selected ? 3 : 2,
-          filter: selected ? 'drop-shadow(0 0 4px rgba(244,63,94,0.5))' : 'none',
-        }} 
+          filter: selected ? 'drop-shadow(0 0 6px rgba(245,184,54,0.5))' : 'none',
+        }}
       />
       {selected && (
         <foreignObject
@@ -80,7 +80,7 @@ function DeletableEdge({ id, sourceX, sourceY, targetX, targetY, sourcePosition,
           y={labelY - 28}
           requiredExtensions="http://www.w3.org/1999/xhtml"
         >
-          <div className="text-[10px] text-center text-text-muted font-bold bg-background/80 rounded px-1">
+          <div className="text-[10px] text-center text-text-muted font-bold bg-white/85 rounded px-1">
             {data.label}
           </div>
         </foreignObject>
@@ -224,17 +224,17 @@ export default function Canvas({
         proOptions={{ hideAttribution: true }}
         className="debye-canvas"
       >
-        {showGrid && <Background color="#2a2a3a" gap={24} size={1} />}
+        {showGrid && <Background color="rgba(11,103,178,0.18)" gap={24} size={1} />}
         <Controls position="bottom-left" />
         <MiniMap 
           position="bottom-right"
           nodeColor={(node) => NODE_COLORS[node.type] || '#4B5563'}
           nodeStrokeWidth={2}
-          maskColor="rgba(10, 10, 18, 0.8)"
+          maskColor="rgba(223, 249, 255, 0.72)"
           style={{
-            backgroundColor: '#13131f',
-            border: '1px solid #2a2a3a',
-            borderRadius: '6px',
+            backgroundColor: 'rgba(255,255,255,0.74)',
+            border: '1px solid rgba(6,37,58,0.13)',
+            borderRadius: '8px',
           }}
         />
 

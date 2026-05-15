@@ -3,7 +3,7 @@ import BaseNode from './BaseNode';
 export default function FluidicsNode(props) {
   const { data } = props;
   return (
-    <BaseNode {...props} type="FLUIDICS" color="#3B82F6">
+    <BaseNode {...props} type="FLUIDICS" color="#2fb8e7">
       <div className="flex flex-col gap-1 text-[10px] text-text-secondary font-mono opacity-80">
         {data.role && <div className="text-white/60 uppercase tracking-tighter text-[8px] font-bold">{data.role}</div>}
         {data.flowRate && <div className="flex justify-between"><span>Flow:</span> <span className="text-white">{data.flowRate} µL/min</span></div>}

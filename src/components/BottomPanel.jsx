@@ -25,20 +25,6 @@ export default function BottomPanel({
   const [collapsed, setCollapsed] = useState(false);
   const isResizing = useRef(false);
 
-  const startResizing = useCallback((e) => {
-    isResizing.current = true;
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', stopResizing);
-    document.body.style.cursor = 'row-resize';
-  }, []);
-
-  const stopResizing = useCallback(() => {
-    isResizing.current = false;
-    document.removeEventListener('mousemove', handleMouseMove);
-    document.removeEventListener('mouseup', stopResizing);
-    document.body.style.cursor = 'default';
-  }, []);
-
   const handleMouseMove = useCallback((e) => {
     if (!isResizing.current) return;
     const newHeight = window.innerHeight - e.clientY;
@@ -46,6 +32,19 @@ export default function BottomPanel({
       setHeight(newHeight);
     }
   }, [setHeight]);
+
+  const stopResizing = useCallback(() => {
+    isResizing.current = false;
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.body.style.cursor = 'default';
+  }, [handleMouseMove]);
+
+  const startResizing = useCallback(() => {
+    isResizing.current = true;
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', stopResizing, { once: true });
+    document.body.style.cursor = 'row-resize';
+  }, [handleMouseMove, stopResizing]);
 
   const tabs = [
     { id: 'simulation', label: 'Simulation', icon: <Activity className="w-4 h-4" /> },

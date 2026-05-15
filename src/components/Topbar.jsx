@@ -1,227 +1,271 @@
-import { Play, Shield, Download, File, FolderOpen, Save, Settings, Grid, ZoomIn, ZoomOut, Maximize, PanelRight, MessageSquare, TerminalSquare } from 'lucide-react';
+import {
+  Download,
+  File,
+  FolderOpen,
+  Grid,
+  Home,
+  LogOut,
+  Maximize,
+  MessageSquare,
+  PanelRight,
+  Play,
+  Save,
+  Settings,
+  Shield,
+  Sparkles,
+  TerminalSquare,
+  UserRound,
+  ZoomIn,
+  ZoomOut,
+} from 'lucide-react';
 import { useReactFlow } from '@xyflow/react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 
-export default function Topbar({ 
-  scenario, 
-  setScenario, 
-  onSimulate, 
-  onRunDRC, 
-  onExport, 
-  onNewProject, 
-  onSaveProject, 
-  onOpenProject, 
-  onClearCanvas, 
-  showGrid, 
-  setShowGrid, 
-  hasUnsavedChanges, 
+function ToggleButton({ active, children, onClick, title }) {
+  return (
+    <button
+      className={`designer-icon-button ${active ? 'is-active' : ''}`}
+      onClick={onClick}
+      title={title}
+      type="button"
+    >
+      {children}
+    </button>
+  );
+}
+
+export default function Topbar({
+  scenario,
+  setScenario,
+  onSimulate,
+  onRunDRC,
+  onExport,
+  onNewProject,
+  onSaveProject,
+  onOpenProject,
+  onClearCanvas,
+  showGrid,
+  setShowGrid,
+  hasUnsavedChanges,
   nodeCount,
   showProperties,
   setShowProperties,
   showCopilot,
   setShowCopilot,
   showBottomPanel,
-  setShowBottomPanel
+  setShowBottomPanel,
 }) {
   const { zoomIn, zoomOut, fitView } = useReactFlow();
-  
-  return (
-    <div className="flex flex-col shrink-0 border-b border-border z-30 relative">
-      {/* Menu Bar (Altium/Cadence style) */}
-      <div className="h-[28px] bg-[#1a1a24] flex items-center px-2 text-[13px]">
-        <div className="flex items-center gap-2 pr-4 border-r border-border/50">
-          <span className="text-accent-primary font-bold tracking-wider">DEBYE</span>
-        </div>
+  const { isConfigured, user, signOut } = useAuth();
 
-        <div className="flex px-2 items-center flex-1">
-          <div className="flex space-x-1">
-          {/* File Menu */}
-          <div className="relative group">
-            <button className="px-3 py-1 text-text-secondary hover:bg-surface-raised hover:text-text-primary rounded cursor-default">File</button>
-            <div className="absolute left-0 top-full mt-0 w-56 bg-surface-raised border border-border rounded-md shadow-lg hidden group-hover:block py-1 z-50">
-              <button onClick={onNewProject} className="w-full text-left px-4 py-2 text-text-primary hover:bg-accent-primary hover:text-white flex items-center gap-2">
+  return (
+    <div className="designer-topbar flex flex-col shrink-0 border-b border-border z-30 relative">
+      <div className="designer-menubar">
+        <div className="designer-menu-left">
+          <Link to="/" className="designer-brand">
+            <Home className="w-3.5 h-3.5" />
+            <span>DEBYE</span>
+          </Link>
+
+          <div className="designer-menu-group">
+            <button className="designer-menu-trigger" type="button">
+              File
+            </button>
+            <div className="designer-dropdown">
+              <button onClick={onNewProject} type="button">
                 <File className="w-4 h-4" /> New Blank Project
               </button>
-              <button onClick={() => setScenario(0)} className="w-full text-left px-4 py-2 text-text-primary hover:bg-accent-primary hover:text-white flex items-center gap-2">
-                <span className="text-accent-secondary">✨</span> AI Copilot Design...
+              <button onClick={() => setScenario(0)} type="button">
+                <Sparkles className="w-4 h-4" /> AI Copilot Design...
               </button>
-              <div className="h-px bg-border my-1"></div>
-              <button onClick={onOpenProject} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface flex items-center gap-2">
-                <FolderOpen className="w-4 h-4" /> Open Project (Device)...
+              <div className="designer-menu-rule" />
+              <button onClick={onOpenProject} type="button">
+                <FolderOpen className="w-4 h-4" /> Open Project...
               </button>
-              <button onClick={onSaveProject} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface flex items-center gap-2">
-                <Save className="w-4 h-4" /> Save Project (Device)...
+              <button onClick={onSaveProject} type="button">
+                <Save className="w-4 h-4" /> Save Project...
               </button>
-              <div className="h-px bg-border my-1"></div>
-              <div className="px-4 py-1 text-text-muted text-[11px] font-bold uppercase tracking-wider">Open Example</div>
-              <button onClick={() => setScenario(1)} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface">Continuous Glucose Monitor</button>
-              <button onClick={() => setScenario(2)} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface">Cardiac Arrhythmia Patch</button>
-              <button onClick={() => setScenario(3)} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface">Cancer Biomarker Chip</button>
-              <button onClick={() => setScenario(4)} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface">Electrical Wound Patch</button>
-              <button onClick={() => setScenario(5)} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface">Implantable Drug Delivery</button>
-              <div className="h-px bg-border my-1"></div>
-              <button onClick={onExport} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface flex items-center gap-2">
+              <div className="designer-menu-rule" />
+              <div className="designer-menu-label">Open Example</div>
+              <button onClick={() => setScenario(1)} type="button">
+                Continuous Glucose Monitor
+              </button>
+              <button onClick={() => setScenario(2)} type="button">
+                Cardiac Arrhythmia Patch
+              </button>
+              <button onClick={() => setScenario(3)} type="button">
+                Cancer Biomarker Chip
+              </button>
+              <button onClick={() => setScenario(4)} type="button">
+                Electrical Wound Patch
+              </button>
+              <button onClick={() => setScenario(5)} type="button">
+                Implantable Drug Delivery
+              </button>
+              <div className="designer-menu-rule" />
+              <button onClick={onExport} type="button">
                 <Download className="w-4 h-4" /> Export BOM & Netlist...
               </button>
             </div>
           </div>
-          
-          {/* Edit Menu */}
-          <div className="relative group">
-            <button className="px-3 py-1 text-text-secondary hover:bg-surface-raised hover:text-text-primary rounded cursor-default">Edit</button>
-            <div className="absolute left-0 top-full mt-0 w-48 bg-surface-raised border border-border rounded-md shadow-lg hidden group-hover:block py-1 z-50">
-              <button className="w-full text-left px-4 py-2 text-text-secondary hover:bg-surface opacity-50 cursor-not-allowed">Undo (Ctrl+Z)</button>
-              <button className="w-full text-left px-4 py-2 text-text-secondary hover:bg-surface opacity-50 cursor-not-allowed">Redo (Ctrl+Y)</button>
-              <div className="h-px bg-border my-1"></div>
-              <button onClick={onClearCanvas} className="w-full text-left px-4 py-2 text-text-primary hover:bg-accent-error hover:text-white">Clear Canvas</button>
+
+          <div className="designer-menu-group">
+            <button className="designer-menu-trigger" type="button">
+              Edit
+            </button>
+            <div className="designer-dropdown">
+              <button className="is-disabled" type="button">
+                Undo (Ctrl+Z)
+              </button>
+              <button className="is-disabled" type="button">
+                Redo (Ctrl+Y)
+              </button>
+              <div className="designer-menu-rule" />
+              <button onClick={onClearCanvas} type="button">
+                Clear Canvas
+              </button>
             </div>
           </div>
 
-          {/* View Menu */}
-          <div className="relative group">
-            <button className="px-3 py-1 text-text-secondary hover:bg-surface-raised hover:text-text-primary rounded cursor-default">View</button>
-            <div className="absolute left-0 top-full mt-0 w-56 bg-surface-raised border border-border rounded-md shadow-lg hidden group-hover:block py-1 z-50">
-              <button onClick={() => setShowGrid(!showGrid)} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface flex items-center justify-between">
+          <div className="designer-menu-group">
+            <button className="designer-menu-trigger" type="button">
+              View
+            </button>
+            <div className="designer-dropdown">
+              <button onClick={() => setShowGrid(!showGrid)} type="button">
                 <span>Show Grid</span>
-                {showGrid && <span className="text-accent-primary">✓</span>}
+                <strong>{showGrid ? 'On' : 'Off'}</strong>
               </button>
-              <div className="h-px bg-border my-1"></div>
-              <button onClick={() => setShowProperties(!showProperties)} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface flex items-center justify-between">
+              <button onClick={() => setShowProperties(!showProperties)} type="button">
                 <span>Properties Inspector</span>
-                {showProperties && <span className="text-accent-primary">✓</span>}
+                <strong>{showProperties ? 'On' : 'Off'}</strong>
               </button>
-              <button onClick={() => setShowCopilot(!showCopilot)} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface flex items-center justify-between">
+              <button onClick={() => setShowCopilot(!showCopilot)} type="button">
                 <span>AI Copilot</span>
-                {showCopilot && <span className="text-accent-primary">✓</span>}
+                <strong>{showCopilot ? 'On' : 'Off'}</strong>
               </button>
-              <button onClick={() => setShowBottomPanel(!showBottomPanel)} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface flex items-center justify-between">
+              <button onClick={() => setShowBottomPanel(!showBottomPanel)} type="button">
                 <span>Bottom Panel</span>
-                {showBottomPanel && <span className="text-accent-primary">✓</span>}
+                <strong>{showBottomPanel ? 'On' : 'Off'}</strong>
               </button>
-              <div className="h-px bg-border my-1"></div>
-              <button onClick={() => zoomIn()} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface">Zoom In</button>
-              <button onClick={() => zoomOut()} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface">Zoom Out</button>
-              <button onClick={() => fitView({ duration: 800 })} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface">Fit View to Contents</button>
-            </div>
-          </div>
-
-          {/* Place Menu */}
-          <div className="relative group">
-            <button className="px-3 py-1 text-text-secondary hover:bg-surface-raised hover:text-text-primary rounded cursor-default">Place</button>
-            <div className="absolute left-0 top-full mt-0 w-48 bg-surface-raised border border-border rounded-md shadow-lg hidden group-hover:block py-1 z-50">
-              <div className="px-4 py-2 text-text-muted text-xs italic">Drag items from the left palette to place them on the canvas.</div>
-            </div>
-          </div>
-
-          {/* Tools Menu */}
-          <div className="relative group">
-            <button className="px-3 py-1 text-text-secondary hover:bg-surface-raised hover:text-text-primary rounded cursor-default">Tools</button>
-            <div className="absolute left-0 top-full mt-0 w-64 bg-surface-raised border border-border rounded-md shadow-lg hidden group-hover:block py-1 z-50">
-              <button onClick={onRunDRC} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface flex items-center gap-2">
-                <Shield className="w-4 h-4 text-accent-error" /> Run Design Rule Check (F9)
+              <div className="designer-menu-rule" />
+              <button onClick={() => zoomIn()} type="button">
+                Zoom In
               </button>
-              <button onClick={onSimulate} className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface flex items-center gap-2">
-                <Play className="w-4 h-4 text-accent-secondary" /> Run Mixed-Signal Simulation (F10)
+              <button onClick={() => zoomOut()} type="button">
+                Zoom Out
+              </button>
+              <button onClick={() => fitView({ duration: 800 })} type="button">
+                Fit View to Contents
               </button>
             </div>
           </div>
 
-          {/* Help Menu */}
-          <div className="relative group">
-            <button className="px-3 py-1 text-text-secondary hover:bg-surface-raised hover:text-text-primary rounded cursor-default">Help</button>
-            <div className="absolute left-0 top-full mt-0 w-48 bg-surface-raised border border-border rounded-md shadow-lg hidden group-hover:block py-1 z-50">
-              <button className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface">Debye Documentation</button>
-              <button className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface">API Reference</button>
-              <div className="h-px bg-border my-1"></div>
-              <button className="w-full text-left px-4 py-2 text-text-primary hover:bg-surface">About Debye</button>
+          <div className="designer-menu-group">
+            <button className="designer-menu-trigger" type="button">
+              Tools
+            </button>
+            <div className="designer-dropdown wide">
+              <button onClick={onRunDRC} type="button">
+                <Shield className="w-4 h-4" /> Run Design Rule Check (F9)
+              </button>
+              <button onClick={onSimulate} type="button">
+                <Play className="w-4 h-4" /> Run Mixed-Signal Simulation (F10)
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Dynamic Project Title & Status */}
-        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 pointer-events-none">
-          <span className="text-text-muted text-[11px] font-medium tracking-wide">
-            {scenario === null ? 'Untitled.dsn' : `Project_0${scenario}.dsn`}
-          </span>
-          {hasUnsavedChanges && (
-            <div className="w-1.5 h-1.5 rounded-full bg-accent-primary animate-pulse" title="Unsaved changes"></div>
-          )}
+        <div className="designer-project-pill">
+          <span>{scenario === null ? 'Untitled.dsn' : `Project_0${scenario}.dsn`}</span>
+          {hasUnsavedChanges && <i title="Unsaved changes" />}
         </div>
 
-        <div className="ml-auto flex items-center gap-4 text-[11px] text-text-muted font-medium pr-2">
-          <div className="flex items-center gap-1.5">
-            <div className="w-1 h-1 rounded-full bg-green-500"></div>
-            <span>Connected</span>
-          </div>
-          <div className="flex items-center gap-1.5 border-l border-border/30 pl-4">
-            <span className="text-text-primary">{nodeCount}</span>
-            <span>Objects</span>
-          </div>
-          <div className="flex items-center gap-1.5 border-l border-border/30 pl-4">
-             <span>V1.2.0</span>
-          </div>
-        </div>
+        <div className="designer-status">
+          <span className="designer-live-dot" />
+          <span>{isConfigured ? 'Auth ready' : 'Local mode'}</span>
+          <span>{nodeCount} objects</span>
+          <span>V1.2.0</span>
         </div>
       </div>
 
-      {/* Toolbar (Quick Actions) */}
-      <div className="h-[40px] bg-surface flex items-center px-4 gap-2 border-b border-border shadow-sm">
-        <button onClick={onNewProject} className="p-1.5 text-text-muted hover:text-text-primary hover:bg-surface-raised rounded tooltip-trigger" title="New Blank Project">
+      <div className="designer-toolbar">
+        <button className="designer-icon-button" onClick={onNewProject} title="New Blank Project" type="button">
           <File className="w-4 h-4" />
         </button>
-        <button onClick={onOpenProject} className="p-1.5 text-text-muted hover:text-text-primary hover:bg-surface-raised rounded tooltip-trigger" title="Open Project">
+        <button className="designer-icon-button" onClick={onOpenProject} title="Open Project" type="button">
           <FolderOpen className="w-4 h-4" />
         </button>
-        <button onClick={onSaveProject} className="p-1.5 text-text-muted hover:text-text-primary hover:bg-surface-raised rounded tooltip-trigger" title="Save Project">
+        <button className="designer-icon-button" onClick={onSaveProject} title="Save Project" type="button">
           <Save className="w-4 h-4" />
         </button>
-        
-        <div className="h-5 w-px bg-border mx-2"></div>
-        
-        <button onClick={onRunDRC} className="flex items-center gap-1.5 bg-surface-raised border border-border hover:border-accent-error hover:text-accent-error text-text-primary text-xs font-medium px-3 py-1.5 rounded transition-colors tooltip-trigger" title="Run Design Rule Check (F9)">
+
+        <div className="designer-toolbar-rule" />
+
+        <button className="designer-action-button ghost" onClick={onRunDRC} title="Run Design Rule Check (F9)" type="button">
           <Shield className="w-3.5 h-3.5" />
           <span>DRC</span>
         </button>
-        
-        <button onClick={onSimulate} className="flex items-center gap-1.5 bg-accent-secondary/10 border border-accent-secondary text-accent-secondary hover:bg-accent-secondary hover:text-background text-xs font-medium px-3 py-1.5 rounded transition-colors tooltip-trigger" title="Run Mixed-Signal Simulation (F10)">
+
+        <button className="designer-action-button" onClick={onSimulate} title="Run Mixed-Signal Simulation (F10)" type="button">
           <Play className="w-3.5 h-3.5" />
           <span>Simulate</span>
         </button>
 
-        <div className="h-5 w-px bg-border mx-2"></div>
+        <div className="designer-toolbar-rule" />
 
-        <button onClick={() => setShowGrid(!showGrid)} className={`p-1.5 rounded tooltip-trigger ${showGrid ? 'text-accent-primary bg-accent-primary/10' : 'text-text-muted hover:text-text-primary hover:bg-surface-raised'}`} title="Show/Hide Grid">
+        <ToggleButton active={showGrid} onClick={() => setShowGrid(!showGrid)} title="Show/Hide Grid">
           <Grid className="w-4 h-4" />
-        </button>
-        
-        <div className="flex items-center gap-0.5 ml-2">
-          <button onClick={() => setShowProperties(!showProperties)} className={`p-1.5 rounded tooltip-trigger ${showProperties ? 'text-accent-primary bg-accent-primary/10' : 'text-text-muted hover:text-text-primary hover:bg-surface-raised'}`} title="Toggle Properties Panel">
-            <PanelRight className="w-4 h-4" />
-          </button>
-          <button onClick={() => setShowCopilot(!showCopilot)} className={`p-1.5 rounded tooltip-trigger ${showCopilot ? 'text-accent-primary bg-accent-primary/10' : 'text-text-muted hover:text-text-primary hover:bg-surface-raised'}`} title="Toggle AI Copilot">
-            <MessageSquare className="w-4 h-4" />
-          </button>
-          <button onClick={() => setShowBottomPanel(!showBottomPanel)} className={`p-1.5 rounded tooltip-trigger ${showBottomPanel ? 'text-accent-primary bg-accent-primary/10' : 'text-text-muted hover:text-text-primary hover:bg-surface-raised'}`} title="Toggle Bottom Panel">
-            <TerminalSquare className="w-4 h-4" />
-          </button>
-        </div>
+        </ToggleButton>
+        <ToggleButton
+          active={showProperties}
+          onClick={() => setShowProperties(!showProperties)}
+          title="Toggle Properties Panel"
+        >
+          <PanelRight className="w-4 h-4" />
+        </ToggleButton>
+        <ToggleButton active={showCopilot} onClick={() => setShowCopilot(!showCopilot)} title="Toggle AI Copilot">
+          <MessageSquare className="w-4 h-4" />
+        </ToggleButton>
+        <ToggleButton
+          active={showBottomPanel}
+          onClick={() => setShowBottomPanel(!showBottomPanel)}
+          title="Toggle Bottom Panel"
+        >
+          <TerminalSquare className="w-4 h-4" />
+        </ToggleButton>
 
-        <div className="h-5 w-px bg-border mx-2"></div>
+        <div className="designer-toolbar-rule" />
 
-        <button onClick={() => zoomIn()} className="p-1.5 text-text-muted hover:text-text-primary hover:bg-surface-raised rounded tooltip-trigger" title="Zoom In">
+        <button className="designer-icon-button" onClick={() => zoomIn()} title="Zoom In" type="button">
           <ZoomIn className="w-4 h-4" />
         </button>
-        <button onClick={() => zoomOut()} className="p-1.5 text-text-muted hover:text-text-primary hover:bg-surface-raised rounded tooltip-trigger" title="Zoom Out">
+        <button className="designer-icon-button" onClick={() => zoomOut()} title="Zoom Out" type="button">
           <ZoomOut className="w-4 h-4" />
         </button>
-        <button onClick={() => fitView({ duration: 800 })} className="p-1.5 text-text-muted hover:text-text-primary hover:bg-surface-raised rounded tooltip-trigger" title="Fit View">
+        <button className="designer-icon-button" onClick={() => fitView({ duration: 800 })} title="Fit View" type="button">
           <Maximize className="w-4 h-4" />
         </button>
 
-        <div className="ml-auto flex items-center gap-2">
-          <button className="p-1.5 text-text-muted hover:text-text-primary hover:bg-surface-raised rounded tooltip-trigger" title="Settings">
-            <Settings className="w-4 h-4" />
+        <div className="designer-toolbar-spacer" />
+
+        {user ? (
+          <button className="designer-user-pill" onClick={() => signOut()} title="Sign out" type="button">
+            <UserRound className="w-3.5 h-3.5" />
+            <span>{user.email}</span>
+            <LogOut className="w-3.5 h-3.5" />
           </button>
-        </div>
+        ) : (
+          <a className="designer-user-pill" href="/#access">
+            <UserRound className="w-3.5 h-3.5" />
+            <span>Sign in</span>
+          </a>
+        )}
+
+        <button className="designer-icon-button" title="Settings" type="button">
+          <Settings className="w-4 h-4" />
+        </button>
       </div>
     </div>
   );
