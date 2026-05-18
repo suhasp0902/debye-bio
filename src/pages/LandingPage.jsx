@@ -273,7 +273,7 @@ export default function LandingPage() {
             <path d="M30,62 Q50,32 70,62" fill="none" stroke="url(#gradient2b)" stroke-width="5" strokeLinecap="round" />
             <circle cx="50" cy="50" r="4.5" fill="#074678" stroke="#f8fdff" strokeWidth="2" />
           </svg>
-          D<span>E</span>BYE
+          <span className="nav-logo-text">D<span>E</span>BYE</span>
         </a>
         <div className="nav-links">
           <a href="#problem">Problem</a>
