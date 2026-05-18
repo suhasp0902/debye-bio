@@ -111,6 +111,14 @@ export default function Topbar({
               <button onClick={onExport} type="button">
                 <Download className="w-4 h-4" /> Export BOM & Netlist...
               </button>
+              {user && (
+                <>
+                  <div className="designer-menu-rule" />
+                  <button onClick={signOut} type="button" style={{ color: '#e24d42' }}>
+                    <LogOut className="w-4 h-4" /> Sign Out ({user.email})
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
@@ -263,6 +271,21 @@ export default function Topbar({
         <button className="designer-icon-button" title="Settings" type="button">
           <Settings className="w-4 h-4" />
         </button>
+
+        {user && (
+          <>
+            <div className="designer-toolbar-rule" />
+            <button 
+              className="designer-icon-button" 
+              onClick={signOut} 
+              title={`Sign Out (${user.email})`} 
+              type="button"
+              style={{ color: '#e24d42', background: 'rgba(226, 77, 66, 0.08)' }}
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

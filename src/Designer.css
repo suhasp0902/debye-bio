@@ -515,9 +515,18 @@
 
   .designer-menu-left {
     overflow-x: auto;
+    scrollbar-width: none !important;
+  }
+  .designer-menu-left::-webkit-scrollbar {
+    display: none !important;
   }
 
   .designer-toolbar {
     overflow-x: auto;
+    scrollbar-width: none !important;
+  }
+  .designer-toolbar::-webkit-scrollbar {
+    display: none !important;
   }
 }
+
