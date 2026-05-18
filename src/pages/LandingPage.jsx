@@ -480,7 +480,7 @@ export default function LandingPage() {
           <div className="section-shell centered">
             <div className="eyebrow reveal">Debye EDA Suite</div>
             <h2 className="headline-xl reveal">
-              The teams building the next 20 years of medtech should not be designing blind.
+              The teams building the next generation of medtech should not be designing blind.
             </h2>
             <div className="section-rule reveal" />
             <a href="#access" className="cta primary-cta reveal">
