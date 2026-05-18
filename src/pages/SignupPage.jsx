@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
 import AuthLayout from '../components/AuthLayout';
@@ -7,7 +7,13 @@ import { useAuth } from '../hooks/useAuth';
 
 export default function SignupPage() {
   const navigate = useNavigate();
-  const { signUp } = useAuth();
+  const { signUp, user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/designer');
+    }
+  }, [user, navigate]);
   
   const [formData, setFormData] = useState({
     fullName: '',
