@@ -77,8 +77,7 @@ export default function AuthPanel() {
           <p className="auth-kicker">Secure workspace unlocked</p>
           <h3>{user.email}</h3>
           <p>
-            This is a live Supabase Auth session. Users appear in your Supabase dashboard under
-            Authentication.
+            Your session is secure. Head over to the Designer workspace to build, simulate, and analyze your bio-electronic devices.
           </p>
         </div>
         <button className="auth-submit auth-secondary-action" type="button" onClick={handleSignOut}>
@@ -97,8 +96,7 @@ export default function AuthPanel() {
         <p className="auth-kicker">Private beta access</p>
         <h3>Start a real Debye account.</h3>
         <p>
-          Signup and login are wired to Supabase Auth, so user records, sessions, and confirmation
-          emails can be managed from your Supabase project.
+          Sign up to access your private beta workspace, save your bio-electronic layouts, and collaborate with your team.
         </p>
       </div>
 
@@ -176,13 +174,8 @@ export default function AuthPanel() {
         </button>
       </form>
 
-      {!isConfigured && (
-        <div className="auth-config-note">
-          <ShieldCheck size={18} />
-          Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` locally and in Vercel to activate
-          live auth.
-        </div>
-      )}
+
+
       {status && (
         <div className="auth-status">
           <CheckCircle2 size={18} />
