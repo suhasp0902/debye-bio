@@ -9,6 +9,7 @@ export default function AuthProvider({ children }) {
 
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) {
+      setLoading(false);
       return undefined;
     }
 
@@ -48,11 +49,11 @@ export default function AuthProvider({ children }) {
           email,
           password,
           options: {
-            emailRedirectTo: window.location.origin,
+            emailRedirectTo: `${window.location.origin}/login`,
             data: {
               full_name: fullName,
               company,
-              signup_source: 'landing_page',
+              signup_source: 'web_app',
             },
           },
         });
@@ -62,9 +63,36 @@ export default function AuthProvider({ children }) {
 
         return supabase.auth.signInWithPassword({ email, password });
       },
+      signInWithGoogle: async () => {
+        if (!supabase) throw new Error('Supabase is not configured.');
+        return supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: `${window.location.origin}/designer`,
+          },
+        });
+      },
+      signInWithGithub: async () => {
+        if (!supabase) throw new Error('Supabase is not configured.');
+        return supabase.auth.signInWithOAuth({
+          provider: 'github',
+          options: {
+            redirectTo: `${window.location.origin}/designer`,
+          },
+        });
+      },
+      resetPassword: async (email) => {
+        if (!supabase) throw new Error('Supabase is not configured.');
+        return supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+      },
+      updatePassword: async (newPassword) => {
+        if (!supabase) throw new Error('Supabase is not configured.');
+        return supabase.auth.updateUser({ password: newPassword });
+      },
       signOut: async () => {
         if (!supabase) return { error: null };
-
         return supabase.auth.signOut();
       },
     }),

@@ -264,8 +264,7 @@ export default function LandingPage() {
           <a href="#solution">Solution</a>
           <a href="#simulation">Simulation</a>
           <a href="#platform">Applications</a>
-          <a href="#access">Access</a>
-          <Link to="/designer">Designer</Link>
+          <a href="#access">SignIn</a>
         </div>
       </nav>
 
@@ -292,9 +291,9 @@ export default function LandingPage() {
               <span>Simulation-first</span>
             </div>
             <div className="hero-actions reveal reveal-d5">
-              <Link to="/designer" className="cta primary-cta">
+              <a href="#access" className="cta primary-cta">
                 Launch EDA Designer
-              </Link>
+              </a>
               <a href="#problem" className="cta secondary-cta">
                 See the Gap
               </a>
@@ -484,9 +483,9 @@ export default function LandingPage() {
               The teams building the next 20 years of medtech should not be designing blind.
             </h2>
             <div className="section-rule reveal" />
-            <Link to="/designer" className="cta primary-cta reveal">
+            <a href="#access" className="cta primary-cta reveal">
               Launch Designer Demo
-            </Link>
+            </a>
           </div>
         </section>
       </main>
@@ -497,7 +496,7 @@ export default function LandingPage() {
           <a href="#problem">Problem</a>
           <a href="#solution">Solution</a>
           <a href="#simulation">Simulation</a>
-          <Link to="/designer">Designer</Link>
+          <a href="#access">SignIn</a>
         </div>
         <p>(c) 2026 Debye Bio. EDA Software for Living Tissue.</p>
       </footer>
