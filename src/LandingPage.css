@@ -45,6 +45,9 @@
 }
 
 .nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 1.05rem;
   font-weight: 800;
   letter-spacing: 0;
@@ -52,6 +55,13 @@
 
 .nav-logo span {
   color: var(--blue);
+}
+
+.nav-logo-svg {
+  width: 1.45rem;
+  height: 1.45rem;
+  display: inline-block;
+  flex-shrink: 0;
 }
 
 .nav-links {

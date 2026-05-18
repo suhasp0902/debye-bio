@@ -68,7 +68,22 @@ export default function Topbar({
       <div className="designer-menubar">
         <div className="designer-menu-left">
           <Link to="/" className="designer-brand">
-            <Home className="w-3.5 h-3.5" />
+            <svg className="w-4 h-4 shrink-0" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="gradient2a" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#074678" />
+                  <stop offset="100%" stopColor="#00a3c4" />
+                </linearGradient>
+                <linearGradient id="gradient2b" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#00a3c4" />
+                  <stop offset="100%" stopColor="#d97706" />
+                </linearGradient>
+              </defs>
+              <polygon points="50,15 80,32.5 80,67.5 50,85 20,67.5 20,32.5" fill="none" stroke="currentColor" strokeOpacity="0.32" strokeWidth="4.5" />
+              <path d="M30,38 Q50,68 70,38" fill="none" stroke="url(#gradient2a)" strokeWidth="5" strokeLinecap="round" />
+              <path d="M30,62 Q50,32 70,62" fill="none" stroke="url(#gradient2b)" stroke-width="5" strokeLinecap="round" />
+              <circle cx="50" cy="50" r="4.5" fill="#074678" stroke="#f8fdff" strokeWidth="2" />
+            </svg>
             <span>DEBYE</span>
           </Link>
 
