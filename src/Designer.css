@@ -510,23 +510,41 @@
 @media (max-width: 980px) {
   .designer-project-pill,
   .designer-status {
-    display: none;
-  }
-
-  .designer-menu-left {
-    overflow-x: auto;
-    scrollbar-width: none !important;
-  }
-  .designer-menu-left::-webkit-scrollbar {
     display: none !important;
   }
 
-  .designer-toolbar {
-    overflow-x: auto;
+  .designer-menubar {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
     scrollbar-width: none !important;
+    width: 100% !important;
+  }
+  .designer-menubar::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .designer-menu-left {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    flex-shrink: 0 !important;
+    gap: 0.45rem !important;
+  }
+  .designer-menu-left > * {
+    flex-shrink: 0 !important;
+  }
+
+  .designer-toolbar {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    scrollbar-width: none !important;
+    width: 100% !important;
   }
   .designer-toolbar::-webkit-scrollbar {
     display: none !important;
   }
+  .designer-toolbar > * {
+    flex-shrink: 0 !important;
+  }
 }
+
 
