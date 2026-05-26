@@ -9,11 +9,6 @@ export default function FluidicsNode(props) {
         {data.flowRate && <div className="flex justify-between"><span>Flow:</span> <span className="text-inherit font-bold">{data.flowRate} µL/min</span></div>}
         {data.viscosity && <div className="flex justify-between"><span>Visc:</span> <span className="text-inherit font-bold">{data.viscosity} cP</span></div>}
         {data.channelWidth && <div className="flex justify-between"><span>Width:</span> <span className="text-inherit font-bold">{data.channelWidth} µm</span></div>}
-        <div className="mt-2 flex items-center gap-2">
-           <div className="flex-1 h-1.5 bg-[#db2777]/20 rounded-full relative overflow-hidden">
-              <div className="absolute inset-0 bg-[#db2777]/40 animate-pulse"></div>
-           </div>
-        </div>
       </div>
     </BaseNode>
   );

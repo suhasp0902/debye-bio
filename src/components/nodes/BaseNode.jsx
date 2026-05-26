@@ -1,7 +1,7 @@
 import { Handle, Position, NodeResizer } from '@xyflow/react';
 import { X } from 'lucide-react';
 
-export default function BaseNode({ id, data, selected, children, type, color, categoryClass }) {
+export default function BaseNode({ id, data, selected, children, type, categoryClass }) {
   return (
     <div className={`glass-node ${categoryClass} ${selected ? 'glass-node-selected' : ''} group relative`} style={{ minWidth: '160px', minHeight: '90px' }}>
       <NodeResizer 

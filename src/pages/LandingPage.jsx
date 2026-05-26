@@ -5,7 +5,7 @@ import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
 import * as THREE from 'three';
 import { Link } from 'react-router-dom';
-import AuthPanel from '../components/AuthPanel';
+import BrandLogo from '../components/BrandLogo';
 import '../LandingPage.css';
 
 const features = [
@@ -62,10 +62,27 @@ const worlds = [
   },
 ];
 
-const noiseRows = [
-  ['Thermal', '2.1 uVrms', '45%'],
-  ['Amplifier 1/f', '1.6 uVrms', '35%'],
-  ['Motion Artifact', '1.2 uVrms', '26%'],
+const validationChecks = [
+  {
+    title: 'Tissue impedance window',
+    metric: '180 ohm - 2.1 Mohm',
+    desc: 'Checks electrode geometry against the selected tissue model.',
+  },
+  {
+    title: 'Charge injection safety',
+    metric: '3.2x margin',
+    desc: 'Compares stimulation parameters with material charge limits.',
+  },
+  {
+    title: 'Material biocompatibility fit',
+    metric: 'ISO-ready',
+    desc: 'Flags chronic-contact materials before the design reaches fabrication.',
+  },
+  {
+    title: 'Signal transfer confidence',
+    metric: 'Detectable',
+    desc: 'Validates that the interface can carry signal through biological load.',
+  },
 ];
 
 const useCases = [
@@ -172,6 +189,11 @@ export default function LandingPage() {
   const heroRuleRef = useRef(null);
 
   useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+
     const lenis = new Lenis({
       duration: 1.08,
       easing: (t) => 1 - Math.pow(1 - t, 3),
@@ -195,8 +217,6 @@ export default function LandingPage() {
   useEffect(() => {
     const revealEls = document.querySelectorAll('.reveal');
     const ruleEls = document.querySelectorAll('.section-rule, .hero-rule');
-    const noiseEls = document.querySelectorAll('.noise-fill');
-    const curveEls = document.querySelectorAll('.curve-line');
 
     const revealObserver = new IntersectionObserver(
       (entries) => {
@@ -216,30 +236,8 @@ export default function LandingPage() {
       { threshold: 0.25 },
     );
 
-    const noiseObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.style.width = entry.target.dataset.width;
-          }
-        });
-      },
-      { threshold: 0.28 },
-    );
-
-    const curveObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) entry.target.classList.add('drawn');
-        });
-      },
-      { threshold: 0.2 },
-    );
-
     revealEls.forEach((el) => revealObserver.observe(el));
     ruleEls.forEach((el) => ruleObserver.observe(el));
-    noiseEls.forEach((el) => noiseObserver.observe(el));
-    curveEls.forEach((el) => curveObserver.observe(el));
 
     requestAnimationFrame(() => {
       heroRuleRef.current?.classList.add('wide');
@@ -248,8 +246,6 @@ export default function LandingPage() {
     return () => {
       revealObserver.disconnect();
       ruleObserver.disconnect();
-      noiseObserver.disconnect();
-      curveObserver.disconnect();
     };
   }, []);
 
@@ -257,38 +253,14 @@ export default function LandingPage() {
     <div className="landing-body">
       <nav className="landing-nav" aria-label="Landing page navigation">
         <a className="nav-logo" href="#hero" aria-label="Debye home">
-          <svg className="nav-logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="gradient5a" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#581c87" />
-                <stop offset="50%" stopColor="#f43f5e" />
-                <stop offset="100%" stopColor="#ffedd5" />
-              </linearGradient>
-              <linearGradient id="gradient5b" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#ffedd5" />
-                <stop offset="50%" stopColor="#f59e0b" />
-                <stop offset="100%" stopColor="#ea580c" />
-              </linearGradient>
-            </defs>
-            <polygon points="50,15 80,32.5 80,67.5 50,85 20,67.5 20,32.5" fill="none" stroke="currentColor" strokeOpacity="0.32" strokeWidth="4.5" />
-            <circle cx="50" cy="15" r="4" fill="#f43f5e" />
-            <circle cx="80" cy="32.5" r="4" fill="#ffedd5" />
-            <circle cx="80" cy="67.5" r="4" fill="#f59e0b" />
-            <circle cx="50" cy="85" r="4" fill="#ea580c" />
-            <circle cx="20" cy="67.5" r="4" fill="#581c87" />
-            <circle cx="20" cy="32.5" r="4" fill="#f43f5e" />
-            <path d="M30,38 Q50,68 70,38" fill="none" stroke="url(#gradient5a)" strokeWidth="5" strokeLinecap="round" />
-            <path d="M30,62 Q50,32 70,62" fill="none" stroke="url(#gradient5b)" stroke-width="5" strokeLinecap="round" />
-            <circle cx="50" cy="50" r="4.5" fill="#f43f5e" stroke="#f8fdff" strokeWidth="2" />
-          </svg>
-          <span className="nav-logo-text">D<span>E</span>BYE</span>
+          <BrandLogo idPrefix="lp" />
         </a>
         <div className="nav-links">
           <a href="#problem">Problem</a>
           <a href="#solution">Solution</a>
           <a href="#simulation">Simulation</a>
           <a href="#platform">Applications</a>
-          <a href="#access">SignIn</a>
+          <Link to="/designer">Launch</Link>
         </div>
       </nav>
 
@@ -309,15 +281,10 @@ export default function LandingPage() {
               The first electronic design platform built for bio-electronic interfaces. Every electrode,
               every tissue, every noise source - modelled natively.
             </p>
-            <div className="hero-tags reveal reveal-d4" aria-label="Product qualities">
-              <span>EDA for Bioelectronics</span>
-              <span>Tissue-aware</span>
-              <span>Simulation-first</span>
-            </div>
             <div className="hero-actions reveal reveal-d5">
-              <a href="#access" className="cta primary-cta">
+              <Link to="/designer" className="cta primary-cta">
                 Launch EDA Designer
-              </a>
+              </Link>
               <a href="#problem" className="cta secondary-cta">
                 See the Gap
               </a>
@@ -388,47 +355,37 @@ export default function LandingPage() {
           <div className="section-shell centered">
             <div className="eyebrow reveal">04 - Live Simulation</div>
             <h2 className="headline-l reveal">
-              Noise budget. Before you build anything.
+              Validate the tissue interface before fabrication.
             </h2>
             <p className="body-text centered-copy reveal">
-              Five noise sources. Quantified individually. Every design, every biological environment.
+              Debye checks whether the biological load, electrode material, stimulation envelope,
+              and signal path can work together before a prototype is built.
             </p>
 
-            <div className="simulation-board reveal">
-              <svg className="sim-svg" viewBox="0 0 760 260" preserveAspectRatio="none" role="img" aria-label="Impedance and phase simulation chart">
-                <defs>
-                  <linearGradient id="chartA" x1="0" x2="1" y1="0" y2="0">
-                    <stop offset="0%" stopColor="#0b67b2" />
-                    <stop offset="55%" stopColor="#25c9dc" />
-                    <stop offset="100%" stopColor="#f5b836" />
-                  </linearGradient>
-                </defs>
-                <line x1="0" y1="58" x2="760" y2="58" />
-                <line x1="0" y1="116" x2="760" y2="116" />
-                <line x1="0" y1="174" x2="760" y2="174" />
-                <line x1="304" y1="0" x2="304" y2="260" className="marker" />
-                <text x="318" y="30">1 kHz</text>
-                <path
-                  className="curve-line curve-main"
-                  d="M 0,24 C 55,26 104,38 154,62 C 218,94 252,126 304,154 C 374,191 455,209 540,219 C 608,228 686,235 760,240"
-                />
-                <path
-                  className="curve-line curve-secondary"
-                  d="M 0,185 C 70,178 116,154 164,116 C 210,80 258,53 320,48 C 405,42 496,59 586,82 C 646,98 705,114 760,122"
-                />
-              </svg>
-            </div>
-
-            <div className="noise-bars reveal">
-              {noiseRows.map(([label, value, width], index) => (
-                <div className="noise-row" key={label}>
-                  <span>{label}</span>
-                  <div className="noise-track">
-                    <div className={index === 2 ? 'noise-fill gold-fill' : 'noise-fill'} data-width={width} />
+            <div className="validation-board reveal">
+              <div className="validation-stack" aria-label="Validation flow">
+                {['Tissue', 'Electrode interface', 'Circuit load'].map((label) => (
+                  <div className="validation-layer" key={label}>
+                    <span>{label}</span>
+                    <strong>validated</strong>
                   </div>
-                  <strong>{value}</strong>
+                ))}
+                <div className="validation-line">
+                  <i />
+                  <b />
                 </div>
-              ))}
+              </div>
+
+              <div className="validation-grid">
+                {validationChecks.map((check) => (
+                  <article className="validation-card" key={check.title}>
+                    <span>PASS</span>
+                    <h3>{check.title}</h3>
+                    <strong>{check.metric}</strong>
+                    <p>{check.desc}</p>
+                  </article>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -481,25 +438,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="access" className="landing-section access-section">
-          <div className="section-shell access-shell">
-            <div>
-              <div className="eyebrow reveal">07 - Access</div>
-              <h2 className="headline-l reveal">Bring the team into one secure workspace.</h2>
-              <p className="body-text reveal">
-                Create a real account, return to the same session, and give the product team a clean
-                path to understand signups, active users, and private beta demand.
-              </p>
-              <div className="access-proof reveal">
-                <span>Supabase Auth</span>
-                <span>Email sessions</span>
-                <span>Dashboard metrics</span>
-              </div>
-            </div>
-            <AuthPanel />
-          </div>
-        </section>
-
         <section id="cta-section" className="landing-section final-section">
           <div className="section-shell centered">
             <div className="eyebrow reveal">Debye EDA Suite</div>
@@ -507,9 +445,9 @@ export default function LandingPage() {
               The teams building the next generation of medtech should not be designing blind.
             </h2>
             <div className="section-rule reveal" />
-            <a href="#access" className="cta primary-cta reveal">
+            <Link to="/designer" className="cta primary-cta reveal">
               Launch Designer Demo
-            </a>
+            </Link>
           </div>
         </section>
       </main>
@@ -520,7 +458,7 @@ export default function LandingPage() {
           <a href="#problem">Problem</a>
           <a href="#solution">Solution</a>
           <a href="#simulation">Simulation</a>
-          <a href="#access">SignIn</a>
+          <Link to="/designer">Launch</Link>
         </div>
         <p>(c) 2026 Debye Bio. EDA Software for Living Tissue.</p>
       </footer>

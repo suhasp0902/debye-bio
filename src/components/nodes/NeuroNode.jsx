@@ -9,11 +9,6 @@ export default function NeuroNode(props) {
         {data.frequency && <div className="flex justify-between"><span>Freq:</span> <span className="text-inherit font-bold">{data.frequency} Hz</span></div>}
         {data.pulseWidth && <div className="flex justify-between"><span>Pulse:</span> <span className="text-inherit font-bold">{data.pulseWidth} µs</span></div>}
         {data.chargeDensity && <div className="flex justify-between"><span>Charge:</span> <span className="text-inherit font-bold">{data.chargeDensity} µC/cm²</span></div>}
-        <div className="mt-2 flex gap-0.5 h-3 items-end">
-          {[4, 10, 4, 10, 4].map((h, i) => (
-            <div key={i} className="bg-[#7c3aed] w-1.5" style={{ height: h + 'px' }}></div>
-          ))}
-        </div>
       </div>
     </BaseNode>
   );

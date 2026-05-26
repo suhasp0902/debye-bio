@@ -3,8 +3,6 @@ import {
   File,
   FolderOpen,
   Grid,
-  Home,
-  LogOut,
   Maximize,
   MessageSquare,
   Moon,
@@ -16,13 +14,12 @@ import {
   Sparkles,
   Sun,
   TerminalSquare,
-  UserRound,
   ZoomIn,
   ZoomOut,
 } from 'lucide-react';
 import { useReactFlow } from '@xyflow/react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import BrandLogo from './BrandLogo';
 
 function ToggleButton({ active, children, onClick, title }) {
   return (
@@ -61,38 +58,13 @@ export default function Topbar({
   setDarkMode,
 }) {
   const { zoomIn, zoomOut, fitView } = useReactFlow();
-  const { isConfigured, user, signOut } = useAuth();
 
   return (
     <div className="designer-topbar flex flex-col shrink-0 border-b border-border z-30 relative">
       <div className="designer-menubar">
         <div className="designer-menu-left">
-          <Link to="/" className="designer-brand">
-            <svg className="w-4 h-4 shrink-0" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <linearGradient id="gradient5a" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#581c87" />
-                  <stop offset="50%" stopColor="#f43f5e" />
-                  <stop offset="100%" stopColor="#ffedd5" />
-                </linearGradient>
-                <linearGradient id="gradient5b" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#ffedd5" />
-                  <stop offset="50%" stopColor="#f59e0b" />
-                  <stop offset="100%" stopColor="#ea580c" />
-                </linearGradient>
-              </defs>
-              <polygon points="50,15 80,32.5 80,67.5 50,85 20,67.5 20,32.5" fill="none" stroke="currentColor" strokeOpacity="0.32" strokeWidth="4.5" />
-              <circle cx="50" cy="15" r="4" fill="#f43f5e" />
-              <circle cx="80" cy="32.5" r="4" fill="#ffedd5" />
-              <circle cx="80" cy="67.5" r="4" fill="#f59e0b" />
-              <circle cx="50" cy="85" r="4" fill="#ea580c" />
-              <circle cx="20" cy="67.5" r="4" fill="#581c87" />
-              <circle cx="20" cy="32.5" r="4" fill="#f43f5e" />
-              <path d="M30,38 Q50,68 70,38" fill="none" stroke="url(#gradient5a)" strokeWidth="5" strokeLinecap="round" />
-              <path d="M30,62 Q50,32 70,62" fill="none" stroke="url(#gradient5b)" stroke-width="5" strokeLinecap="round" />
-              <circle cx="50" cy="50" r="4.5" fill="#f43f5e" stroke="#f8fdff" strokeWidth="2" />
-            </svg>
-            <span>DEBYE</span>
+          <Link to="/" className="designer-brand" aria-label="Debye home">
+            <BrandLogo idPrefix="tb" svgClass="w-4 h-4 shrink-0" />
           </Link>
 
           <div className="designer-menu-group">
@@ -134,14 +106,6 @@ export default function Topbar({
               <button onClick={onExport} type="button">
                 <Download className="w-4 h-4" /> Export BOM & Netlist...
               </button>
-              {user && (
-                <>
-                  <div className="designer-menu-rule" />
-                  <button onClick={signOut} type="button" style={{ color: '#e24d42' }}>
-                    <LogOut className="w-4 h-4" /> Sign Out ({user.email})
-                  </button>
-                </>
-              )}
             </div>
           </div>
 
@@ -219,7 +183,7 @@ export default function Topbar({
 
         <div className="designer-status">
           <span className="designer-live-dot" />
-          <span>{isConfigured ? 'Auth ready' : 'Local mode'}</span>
+          <span>Designer ready</span>
           <span>{nodeCount} objects</span>
           <span>V1.2.0</span>
         </div>
@@ -295,20 +259,6 @@ export default function Topbar({
           <Settings className="w-4 h-4" />
         </button>
 
-        {user && (
-          <>
-            <div className="designer-toolbar-rule" />
-            <button 
-              className="designer-icon-button" 
-              onClick={signOut} 
-              title={`Sign Out (${user.email})`} 
-              type="button"
-              style={{ color: '#e24d42', background: 'rgba(226, 77, 66, 0.08)' }}
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </>
-        )}
       </div>
     </div>
   );
