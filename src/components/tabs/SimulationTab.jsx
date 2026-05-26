@@ -127,8 +127,8 @@ export default function SimulationTab({ data, isRunning }) {
                 <XAxis dataKey="time" hide />
                 <YAxis stroke="#4d7183" fontSize={10} tickFormatter={(val) => `${val}uV`} />
                 <RechartsTooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: 'rgba(6,37,58,0.13)', fontSize: '10px' }} />
-                <Line type="monotone" dataKey="voltage" stroke="#25c9dc" strokeWidth={1.5} dot={false} isAnimationActive animationDuration={1000} name="Signal + Noise" />
-                <Line type="monotone" dataKey="signal" stroke="#0b67b2" strokeWidth={1} strokeDasharray="4 4" dot={false} isAnimationActive={false} name="Ideal Signal" />
+                <Line type="monotone" dataKey="output" stroke="#25c9dc" strokeWidth={1.5} dot={false} isAnimationActive animationDuration={1000} name="Output (Signal+Noise)" />
+                <Line type="monotone" dataKey="raw" stroke="#0b67b2" strokeWidth={1} strokeDasharray="4 4" dot={false} isAnimationActive={false} name="Ideal Raw Signal" />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -148,31 +148,34 @@ export default function SimulationTab({ data, isRunning }) {
             </div>
             <div className="h-px bg-border my-1" />
             <div>
-              <span className="text-accent-secondary block mb-1">Randles + CPE + Warburg</span>
+              <span className="text-accent-secondary block mb-1">Randles + Warburg</span>
               <div className="grid grid-cols-2 gap-1">
                 <div>Rs: <span className="text-text-primary">{physicsParams?.rSolution} ohm</span></div>
                 <div>Rct: <span className="text-text-primary">{physicsParams?.rCt} ohm</span></div>
-                <div>Q: <span className="text-text-primary">{physicsParams?.cpeQ}</span></div>
-                <div>Nernst: <span className="text-text-primary">{physicsParams?.nernst_mV} mV</span></div>
+                <div>Cdl: <span className="text-text-primary">{physicsParams?.cDl} F</span></div>
+                <div>Aw: <span className="text-text-primary">{physicsParams?.aw}</span></div>
               </div>
             </div>
           </div>
         </div>
 
         <div className="bg-surface-raised border border-border rounded-md p-3 flex flex-col">
-          <div className="text-xs font-bold text-text-primary mb-2 shrink-0">Design Variants</div>
-          <div className="flex-1 overflow-y-auto custom-scrollbar space-y-1">
-            {(designVariants || []).slice(0, 4).map(variant => (
-              <div key={variant.material} className="grid grid-cols-[1fr_auto] gap-2 rounded border border-border bg-surface px-2 py-1.5 text-[10px]">
-                <span className="truncate text-text-secondary">{variant.name}</span>
-                <span className="font-mono text-text-primary">{variant.snr} dB</span>
-              </div>
-            ))}
-            {safetyMargins && (
-              <div className="mt-2 text-[10px] text-text-muted leading-relaxed">
-                SNR margin: {safetyMargins.snrMarginDb} dB. Charge margin: {safetyMargins.chargeInjectionMargin}x.
-              </div>
-            )}
+          <div className="text-xs font-bold text-text-primary mb-2 shrink-0">Safety & Biocompatibility</div>
+          <div className="flex-1 overflow-y-auto custom-scrollbar space-y-2 text-[10px] text-text-secondary">
+            <div className="grid grid-cols-2 gap-1">
+              <div>Time in Body: <span className="text-text-primary font-mono">{data.timeInBodyDays} days</span></div>
+              <div>FBR Factor: <span className="text-text-primary font-mono">{data.fbrFactor}x</span></div>
+            </div>
+            <div className="h-px bg-border my-1" />
+            <div className="grid grid-cols-1 gap-1">
+              <div>Safe Charge Cap: <span className="text-text-primary font-mono">{data.chargeCapacityTotal} mC</span></div>
+              <div>Injected Charge: <span className="text-text-primary font-mono">{data.injectedCharge} mC</span></div>
+              <div>Status: <span className={`font-mono font-bold ${data.cicSafe ? 'text-accent-success' : 'text-accent-warning'}`}>{data.cicSafe ? 'SAFE' : 'UNSAFE'}</span></div>
+            </div>
+            <div className="h-px bg-border my-1" />
+            <div>
+              Temp Rise (SAR proxy): <span className="text-text-primary font-mono">+{data.tempRise_C} °C</span>
+            </div>
           </div>
         </div>
       </div>

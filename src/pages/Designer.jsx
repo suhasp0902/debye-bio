@@ -13,8 +13,39 @@ import '../Designer.css';
 
 export default function Designer() {
   const [scenarioId, setScenarioId] = useState(null); // null means blank canvas
-  const [nodes, setNodes] = useState([]);
-  const [edges, setEdges] = useState([]);
+  const [history, setHistory] = useState([{ nodes: [], edges: [] }]);
+  const [historyIndex, setHistoryIndex] = useState(0);
+  const nodes = history[historyIndex].nodes;
+  const edges = history[historyIndex].edges;
+  
+  const setNodes = useCallback((newNodes) => {
+    const nextNodes = typeof newNodes === 'function' ? newNodes(nodes) : newNodes;
+    if (nextNodes === nodes) return;
+    setHistory(prev => {
+      const newHistory = prev.slice(0, historyIndex + 1);
+      return [...newHistory, { nodes: nextNodes, edges }];
+    });
+    setHistoryIndex(prev => prev + 1);
+  }, [nodes, edges, historyIndex]);
+
+  const setEdges = useCallback((newEdges) => {
+    const nextEdges = typeof newEdges === 'function' ? newEdges(edges) : newEdges;
+    if (nextEdges === edges) return;
+    setHistory(prev => {
+      const newHistory = prev.slice(0, historyIndex + 1);
+      return [...newHistory, { nodes, edges: nextEdges }];
+    });
+    setHistoryIndex(prev => prev + 1);
+  }, [nodes, edges, historyIndex]);
+
+  const handleUndo = useCallback(() => {
+    if (historyIndex > 0) setHistoryIndex(prev => prev - 1);
+  }, [historyIndex]);
+
+  const handleRedo = useCallback(() => {
+    if (historyIndex < history.length - 1) setHistoryIndex(prev => prev + 1);
+  }, [historyIndex, history.length]);
+
   const [selectedNode, setSelectedNode] = useState(null);
   
   const [simulationData, setSimulationData] = useState(null);
@@ -197,27 +228,40 @@ export default function Designer() {
        addToast('Canvas is empty. Nothing to export.', 'warning');
        return;
     }
-    addLog(`Generating BOM and Bio-Electrical Netlist...`);
+    addLog(`Generating SPICE Netlist and BOM...`);
 
-    let bom = "DEBYE BIO-ELECTRONICS SUITE\nBILL OF MATERIALS\n=================\n";
-    nodes.forEach(n => {
-       bom += `- [${n.type.toUpperCase()}] ${n.data.label || n.id}\n`;
-       if (n.data.material) bom += `  Material: ${n.data.material}\n`;
-       if (n.data.area) bom += `  Area: ${n.data.area} µm²\n`;
+    let spice = "* DEBYE BIO SPICE NETLIST *\n";
+    spice += "* Generated automatically from Debye Bio-Electronics Suite\n\n";
+    
+    // Create SPICE nodes
+    nodes.forEach((n, idx) => {
+       const nId = n.id.replace(/-/g, '_');
+       if (n.type === 'biology' || n.data?.type === 'tissue') {
+           spice += `* Tissue: ${n.data.label}\n`;
+           spice += `R_inf_${nId} Node_${nId}_1 Node_${nId}_2 100\n`;
+           spice += `C_cole_${nId} Node_${nId}_2 Node_${nId}_3 1u\n`;
+           spice += `R_cole_${nId} Node_${nId}_3 Node_${nId}_4 500\n\n`;
+       } else if (n.type === 'electrode' || n.data?.role === 'Electrode Contact') {
+           spice += `* Electrode: ${n.data.label}\n`;
+           spice += `R_sol_${nId} Node_${nId}_A Node_${nId}_B 150\n`;
+           spice += `R_ct_${nId} Node_${nId}_B Node_${nId}_C 1Meg\n`;
+           spice += `C_dl_${nId} Node_${nId}_B Node_${nId}_C 10u\n\n`;
+       }
     });
 
-    let netlist = "\nBIO-ELECTRICAL NETLIST\n=====================\n";
     edges.forEach(e => {
-       const source = nodes.find(n => n.id === e.source)?.data.label || e.source;
-       const target = nodes.find(n => n.id === e.target)?.data.label || e.target;
-       netlist += `N_${e.id}: ${source} -> ${target} (${e.data?.type || 'mixed'})\n`;
+       const srcId = e.source.replace(/-/g, '_');
+       const tgtId = e.target.replace(/-/g, '_');
+       spice += `V_${e.id.replace(/-/g, '_')} Node_${srcId} Node_${tgtId} 0\n`;
     });
+    
+    spice += "\n.tran 0.1m 100m\n.end\n";
 
-    const blob = new Blob([bom + netlist], { type: 'text/plain' });
+    const blob = new Blob([spice], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Debye_Export_${scenarioId || 'Custom'}.txt`;
+    a.download = `Debye_Export_${scenarioId || 'Custom'}.cir`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -271,8 +315,8 @@ export default function Designer() {
 
   const handleNewProject = () => {
     setScenarioId(null);
-    setNodes([]);
-    setEdges([]);
+    setHistory([{ nodes: [], edges: [] }]);
+    setHistoryIndex(0);
     setSimulationData(null);
     setDrcResults(null);
     setSelectedNode(null);
@@ -303,10 +347,12 @@ export default function Designer() {
       if (e.key === 'F9') { e.preventDefault(); handleRunDRC(); }
       if (e.key === 'F10') { e.preventDefault(); handleSimulate(); }
       if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); handleSaveProject(); }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); handleUndo(); }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'y') { e.preventDefault(); handleRedo(); }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [handleRunDRC, handleSimulate, handleSaveProject]);
+  }, [handleRunDRC, handleSimulate, handleSaveProject, handleUndo, handleRedo]);
 
   const handleOpenProject = () => {
     fileInputRef.current?.click();
