@@ -278,8 +278,7 @@ export default function LandingPage() {
             </h1>
             <div className="hero-rule" ref={heroRuleRef} />
             <p className="body-text hero-copy reveal reveal-d3">
-              The first electronic design platform built for bio-electronic interfaces. Every electrode,
-              every tissue, every noise source - modelled natively.
+              The first electronic design platform built for bio-electronic interfaces.
             </p>
             <div className="hero-actions reveal reveal-d5">
               <Link to="/designer" className="cta primary-cta">
