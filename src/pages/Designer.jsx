@@ -228,24 +228,34 @@ export default function Designer() {
        addToast('Canvas is empty. Nothing to export.', 'warning');
        return;
     }
-    addLog(`Generating SPICE Netlist and BOM...`);
+    if (!simulationData) {
+       addToast('Run a simulation first to generate accurate physical models.', 'warning');
+       return;
+    }
+    addLog(`Generating Exact SPICE Netlist and BOM...`);
+
+    const p = simulationData.physicsParams;
 
     let spice = "* DEBYE BIO SPICE NETLIST *\n";
-    spice += "* Generated automatically from Debye Bio-Electronics Suite\n\n";
+    spice += "* Generated automatically from Debye Bio-Electronics Suite\n";
+    spice += `* Tissue: ${simulationData.tissue} | Electrode: ${simulationData.material} (${simulationData.electrodeArea} um2)\n\n`;
     
     // Create SPICE nodes
     nodes.forEach((n, idx) => {
        const nId = n.id.replace(/-/g, '_');
        if (n.type === 'biology' || n.data?.type === 'tissue') {
-           spice += `* Tissue: ${n.data.label}\n`;
-           spice += `R_inf_${nId} Node_${nId}_1 Node_${nId}_2 100\n`;
-           spice += `C_cole_${nId} Node_${nId}_2 Node_${nId}_3 1u\n`;
-           spice += `R_cole_${nId} Node_${nId}_3 Node_${nId}_4 500\n\n`;
+           spice += `* Tissue Component: ${n.data.label}\n`;
+           spice += `* R0 = ${p.r0} ohm-m, R_inf = ${p.r_inf} ohm-m\n`;
+           // R_spread = rho / 4r
+           spice += `R_inf_${nId} Node_${nId}_1 Node_${nId}_2 ${p.rSolution}\n`;
+           spice += `C_cole_${nId} Node_${nId}_2 Node_${nId}_3 ${(p.tau * 1000).toFixed(2)}m\n`;
+           spice += `R_cole_${nId} Node_${nId}_3 Node_${nId}_4 ${(p.rSolution * (p.r0/p.r_inf)).toFixed(0)}\n\n`;
        } else if (n.type === 'electrode' || n.data?.role === 'Electrode Contact') {
-           spice += `* Electrode: ${n.data.label}\n`;
-           spice += `R_sol_${nId} Node_${nId}_A Node_${nId}_B 150\n`;
-           spice += `R_ct_${nId} Node_${nId}_B Node_${nId}_C 1Meg\n`;
-           spice += `C_dl_${nId} Node_${nId}_B Node_${nId}_C 10u\n\n`;
+           spice += `* Electrode Component: ${n.data.label}\n`;
+           spice += `* Rct = ${p.rCt} ohm, Cdl = ${p.cDl} F\n`;
+           spice += `R_sol_${nId} Node_${nId}_A Node_${nId}_B 1.0\n`; // minimal contact resistance
+           spice += `R_ct_${nId} Node_${nId}_B Node_${nId}_C ${p.rCt}\n`;
+           spice += `C_dl_${nId} Node_${nId}_B Node_${nId}_C ${p.cDl}\n\n`;
        }
     });
 

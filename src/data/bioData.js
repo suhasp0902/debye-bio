@@ -6,13 +6,13 @@
 export const TISSUES = {
   subcutaneous: {
     name: "Subcutaneous Tissue",
-    conductivity: 0.3,      // S/m
+    conductivity: 0.02,     // S/m
     permittivity: 1200,
     cole_alpha: 0.78,
     tau: 1.2e-3,
-    r0: 650,                // Low-freq resistance (Ω·cm)
-    r_inf: 320,             // High-freq resistance
-    noise_uV: 1.2,          // Biological background noise µVrms
+    rho0: 50.0,             // Low-freq resistivity (Ω·m)
+    rho_inf: 20.0,          // High-freq resistivity (Ω·m)
+    noise_uV: 1.2,
     application: ["CGM", "Wearable", "Drug Delivery"],
     citation: "Gabriel et al. (1996) Phys. Med. Biol. 41(11)"
   },
@@ -22,8 +22,8 @@ export const TISSUES = {
     permittivity: 1600,
     cole_alpha: 0.72,
     tau: 0.8e-3,
-    r0: 420,
-    r_inf: 180,
+    rho0: 4.2,
+    rho_inf: 1.8,
     noise_uV: 3.0,
     application: ["ECG", "Pacing", "Defibrillation"],
     citation: "Faes et al. (1999) Med. Biol. Eng. Comput. 37(3)"
@@ -34,8 +34,8 @@ export const TISSUES = {
     permittivity: 2000,
     cole_alpha: 0.65,
     tau: 5e-3,
-    r0: 800,
-    r_inf: 350,
+    rho0: 8.0,
+    rho_inf: 3.5,
     noise_uV: 5.0,
     application: ["Neural Recording", "BCI", "DBS"],
     citation: "Logothetis et al. (2007) Nature 450"
@@ -46,8 +46,8 @@ export const TISSUES = {
     permittivity: 1500,
     cole_alpha: 0.70,
     tau: 4e-3,
-    r0: 1200,
-    r_inf: 550,
+    rho0: 12.0,
+    rho_inf: 5.5,
     noise_uV: 2.0,
     application: ["DBS", "Neural Recording"],
     citation: "Gabriel et al. (1996) Phys. Med. Biol. 41(11)"
@@ -58,8 +58,8 @@ export const TISSUES = {
     permittivity: 2500,
     cole_alpha: 0.90,
     tau: 0.2e-3,
-    r0: 180,
-    r_inf: 140,
+    rho0: 1.8,
+    rho_inf: 1.4,
     noise_uV: 0.5,
     application: ["Intravascular", "Blood glucose", "Impedance hematology"],
     citation: "Geddes & Baker (1967) Med. Biol. Eng. 5(3)"
@@ -70,8 +70,8 @@ export const TISSUES = {
     permittivity: 1100,
     cole_alpha: 0.50,
     tau: 8e-3,
-    r0: 12000,
-    r_inf: 100,
+    rho0: 120.0,
+    rho_inf: 10.0,
     noise_uV: 8.0,
     application: ["EEG", "ECG", "Wearable"],
     citation: "Yamamoto & Yamamoto (1976) Med. Biol. Eng. Comput. 14"
@@ -82,8 +82,8 @@ export const TISSUES = {
     permittivity: 3000,
     cole_alpha: 0.60,
     tau: 10e-3,
-    r0: 1500,
-    r_inf: 600,
+    rho0: 15.0,
+    rho_inf: 6.0,
     noise_uV: 2.5,
     application: ["Neural Stimulation", "Pain Management"],
     citation: "Ranck (1963) Exp. Neurol. 7(2)"
@@ -94,8 +94,8 @@ export const TISSUES = {
     permittivity: 2200,
     cole_alpha: 0.82,
     tau: 0.5e-3,
-    r0: 280,
-    r_inf: 120,
+    rho0: 2.8,
+    rho_inf: 1.2,
     noise_uV: 1.8,
     application: ["GI Monitoring", "Gastric Pacing"],
     citation: "O'Brien et al. (2010) Physiol. Meas. 31"
@@ -106,8 +106,8 @@ export const TISSUES = {
     permittivity: 1800,
     cole_alpha: 0.75,
     tau: 1.0e-3,
-    r0: 350,
-    r_inf: 200,
+    rho0: 3.5,
+    rho_inf: 2.0,
     noise_uV: 2.2,
     application: ["Wound Monitoring", "Electrostimulation"],
     citation: "Swain & Bhansali (2019) Biosens. Bioelectron."
@@ -118,8 +118,8 @@ export const TISSUES = {
     permittivity: 1400,
     cole_alpha: 0.68,
     tau: 2.0e-3,
-    r0: 550,
-    r_inf: 280,
+    rho0: 5.5,
+    rho_inf: 2.8,
     noise_uV: 3.5,
     application: ["Chronic Wound Care", "Biofilm Monitoring"],
     citation: "Swain & Bhansali (2019) Biosens. Bioelectron."
@@ -130,8 +130,8 @@ export const TISSUES = {
     permittivity: 1900,
     cole_alpha: 0.63,
     tau: 6e-3,
-    r0: 900,
-    r_inf: 400,
+    rho0: 9.0,
+    rho_inf: 4.0,
     noise_uV: 4.0,
     application: ["Retinal Prosthesis", "ERG Recording"],
     citation: "Weiland & Humayun (2014) IEEE Trans. Biomed. Eng."
@@ -142,8 +142,8 @@ export const TISSUES = {
     permittivity: 2100,
     cole_alpha: 0.73,
     tau: 1.5e-3,
-    r0: 700,
-    r_inf: 300,
+    rho0: 7.0,
+    rho_inf: 3.0,
     noise_uV: 1.0,
     application: ["Bioimpedance Analysis", "Thermal Ablation"],
     citation: "Gabriel et al. (1996) Phys. Med. Biol. 41(11)"
@@ -154,8 +154,8 @@ export const TISSUES = {
     permittivity: 500,
     cole_alpha: 0.55,
     tau: 15e-3,
-    r0: 8000,
-    r_inf: 1200,
+    rho0: 80.0,
+    rho_inf: 12.0,
     noise_uV: 0.2,
     application: ["Fracture Healing", "Implant Osseointegration"],
     citation: "Sierpowska et al. (2006) J. Biomech. 39(5)"
@@ -166,8 +166,8 @@ export const TISSUES = {
     permittivity: 109,
     cole_alpha: 0.97,
     tau: 0.1e-3,
-    r0: 55,
-    r_inf: 52,
+    rho0: 0.55,
+    rho_inf: 0.52,
     noise_uV: 0.3,
     application: ["Intracranial Recording", "DBS"],
     citation: "Gabriel et al. (1996) Phys. Med. Biol. 41(11)"
@@ -178,8 +178,8 @@ export const TISSUES = {
     permittivity: 900,
     cole_alpha: 0.58,
     tau: 12e-3,
-    r0: 3500,
-    r_inf: 700,
+    rho0: 35.0,
+    rho_inf: 7.0,
     noise_uV: 0.4,
     application: ["Body Composition", "Wearable Sensing"],
     citation: "Kyle et al. (2004) Clin. Nutr. 23(6)"
@@ -189,122 +189,132 @@ export const TISSUES = {
 export const MATERIALS = {
   platinum: {
     name: "Platinum",
-    cil: 0.15,                    // Charge injection limit mC/cm²
-    eis_factor: 2.5,              // Impedance multiplier vs reference
+    specific_capacitance_uF_cm2: 20.0,
+    specific_rct_ohm_cm2: 100.0,
+    cil: 0.10,                    
     iso10993: true,
     chronic_safe: true,
     max_years: 10,
     coating: false,
     color: "#E5E4E2",
-    notes: "Gold standard for neural and cardiac electrodes. Excellent biocompatibility, moderate CIL.",
-    citation: "Cogan (2008) Annu. Rev. Biomed. Eng."
+    notes: "Gold standard. Csp ~20 µF/cm², low CIL.",
+    citation: "Rose & Robblee (1990) IEEE Trans. Biomed. Eng."
   },
   platinum_iridium: {
     name: "Platinum-Iridium (90/10)",
+    specific_capacitance_uF_cm2: 50.0,
+    specific_rct_ohm_cm2: 50.0,
     cil: 0.35,
-    eis_factor: 1.8,
     iso10993: true,
     chronic_safe: true,
     max_years: 10,
     coating: false,
     color: "#C8C8C8",
-    notes: "Higher CIL than pure Pt. Harder, more durable. Standard for DBS and cochlear implants.",
+    notes: "Harder, more durable. Higher Csp.",
     citation: "Merrill et al. (2005) J. Neurosci. Methods"
   },
   pedot: {
     name: "PEDOT:PSS",
+    specific_capacitance_uF_cm2: 10000.0,
+    specific_rct_ohm_cm2: 1.0,
     cil: 15.0,
-    eis_factor: 0.05,
     iso10993: true,
     chronic_safe: false,
     max_years: 2,
     coating: true,
     color: "#6B21A8",
-    notes: "Conducting polymer. 100x lower impedance than Pt. Excellent for recording, limited chronic stability.",
-    citation: "Ludwig et al. (2011) J. Neural Eng. 8(1)"
+    notes: "Volumetric capacitance. Csp ~10 mF/cm².",
+    citation: "Ludwig et al. (2006) J. Neural Eng."
   },
   iridium_oxide: {
     name: "Iridium Oxide (IrOx)",
+    specific_capacitance_uF_cm2: 5000.0,
+    specific_rct_ohm_cm2: 5.0,
     cil: 4.0,
-    eis_factor: 0.3,
     iso10993: true,
     chronic_safe: true,
     max_years: 5,
     coating: true,
     color: "#1D4ED8",
-    notes: "High CIL, low impedance. Preferred for retinal prostheses and cortical stimulation.",
-    citation: "Cogan et al. (2004) J. Neural Eng."
+    notes: "High CIL, faradaic pseudocapacitance.",
+    citation: "Cogan (2008) Annu. Rev. Biomed. Eng."
   },
   gold: {
     name: "Gold",
-    cil: 0.1,
-    eis_factor: 3.2,
+    specific_capacitance_uF_cm2: 15.0,
+    specific_rct_ohm_cm2: 120.0,
+    cil: 0.05,
     iso10993: true,
     chronic_safe: true,
     max_years: 8,
     coating: false,
     color: "#EAB308",
-    notes: "Lower CIL than Pt. Used in flexible electronics and microelectrode arrays.",
-    citation: "Williams (2008) Biomaterials 29(13)"
+    notes: "Chemically inert but poor CIL.",
+    citation: "Williams (2008) Biomaterials"
   },
   titanium_nitride: {
     name: "Titanium Nitride (TiN)",
+    specific_capacitance_uF_cm2: 2500.0,
+    specific_rct_ohm_cm2: 10.0,
     cil: 1.0,
-    eis_factor: 0.8,
     iso10993: true,
     chronic_safe: true,
     max_years: 7,
     coating: true,
     color: "#78716C",
-    notes: "High surface area, low impedance. Good for EEG and MEA applications.",
-    citation: "Nordhausen et al. (1996) Brain Res. 726"
+    notes: "High fractal surface area. Csp ~2.5 mF/cm².",
+    citation: "Weiland et al. (2002) IEEE Trans. Biomed. Eng."
   },
   carbon_nanotube: {
     name: "Carbon Nanotube (CNT)",
+    specific_capacitance_uF_cm2: 5000.0,
+    specific_rct_ohm_cm2: 2.0,
     cil: 8.0,
-    eis_factor: 0.1,
     iso10993: false,
     chronic_safe: false,
     max_years: 1,
     coating: true,
     color: "#1C1917",
-    notes: "Extremely low impedance. Chronic biocompatibility not yet established. Research use only.",
+    notes: "Extremely low impedance. Chronic biocompatibility not yet established.",
     citation: "Keefer et al. (2008) Nature Nanotech. 3"
   },
   graphene: {
     name: "Graphene",
+    specific_capacitance_uF_cm2: 3000.0,
+    specific_rct_ohm_cm2: 8.0,
     cil: 3.0,
-    eis_factor: 0.15,
     iso10993: false,
     chronic_safe: false,
     max_years: 1,
     coating: true,
     color: "#374151",
-    notes: "Transparent, flexible. Promising for optical+electrical co-recording. Pre-clinical only.",
+    notes: "Transparent, flexible. Promising for optical+electrical co-recording.",
     citation: "Park et al. (2018) ACS Nano"
   },
   parylene_c: {
     name: "Parylene-C (Insulator)",
+    specific_capacitance_uF_cm2: 0.001,
+    specific_rct_ohm_cm2: 1e9,
     cil: 0,
-    eis_factor: 9999,
     iso10993: true,
     chronic_safe: true,
     max_years: 10,
     coating: false,
     color: "#D1FAE5",
-    notes: "Conformal insulating coating. Standard encapsulant for chronic implants. Not an electrode material.",
+    notes: "Conformal insulating coating. Standard encapsulant for chronic implants.",
     citation: "Seymour et al. (2009) Biomaterials 30(31)"
   },
   titanium: {
     name: "Titanium (Structural)",
+    specific_capacitance_uF_cm2: 0.001,
+    specific_rct_ohm_cm2: 1e9,
     cil: 0,
-    eis_factor: 9999,
     iso10993: true,
     chronic_safe: true,
     max_years: 20,
     coating: false,
     color: "#9CA3AF",
-    notes: "Structural enclosure material. Not an electrode. Best osseointegration of any metal.",
+    notes: "Structural enclosure material. Best osseointegration of any metal.",
     citation: "Albrektsson et al. (1981) Acta Orthop. Scand."
   },
 };

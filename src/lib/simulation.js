@@ -97,12 +97,16 @@ function resolveMaterial(label, itemId) {
 }
 
 /**
- * Cole-Cole impedance model:
+ * Cole-Cole impedance model with Newman spreading resistance
+ * R_spreading = rho / 4r
  * Z(ω) = R_inf + (R_0 - R_inf) / (1 + (jωτ)^α)
  */
-function coleColeImpedance(freq, tissue) {
+function coleColeImpedance(freq, tissue, radius_m) {
   const omega = 2 * Math.PI * freq;
-  const { r0, r_inf, tau, cole_alpha } = tissue;
+  const { rho0, rho_inf, tau, cole_alpha } = tissue;
+
+  const r0 = rho0 / (4 * radius_m);
+  const r_inf = rho_inf / (4 * radius_m);
 
   const wt = omega * tau;
   const wt_alpha = Math.pow(wt, cole_alpha);
@@ -158,19 +162,23 @@ function randlesImpedance(freq, rSolution, rCt, cDl, aw) {
 }
 
 /**
- * Compute electrode circuit parameters from material + area
+ * Compute electrode circuit parameters from explicit physical properties
  */
 function electrodeParams(material, area_um2, timeInBodyDays) {
   // FBR scale factor (fibrosis increases impedance over time, saturating around 30 days)
   const fbrFactor = 1 + 2.5 * (1 - Math.exp(-timeInBodyDays / 14)); 
   
-  // Base impedance values scaled by material factor, area, and FBR
-  const rSolution = 500 * (1000 / area_um2) * (1 + 0.2 * fbrFactor); 
-  const rCt = (2e6 * material.eis_factor) / (area_um2 / 1000) * fbrFactor;
-  const cDl = (50e-9 / material.eis_factor) * (area_um2 / 1000);
-  const aw = (1e5 * material.eis_factor) / (area_um2 / 1000); // Warburg coeff
+  // Convert area to cm^2
+  const area_cm2 = area_um2 * 1e-8;
 
-  return { rSolution: Math.max(50, rSolution), rCt, cDl, aw, fbrFactor };
+  // Specific properties
+  const rCt = (material.specific_rct_ohm_cm2 / area_cm2) * fbrFactor;
+  const cDl = (material.specific_capacitance_uF_cm2 * 1e-6) * area_cm2;
+  
+  // Warburg coefficient (approximated based on Rct scale to simulate diffusion limitations)
+  const aw = (material.specific_rct_ohm_cm2 * 0.05) / area_cm2; 
+
+  return { rCt, cDl, aw, fbrFactor, area_cm2 };
 }
 
 /**
@@ -235,18 +243,24 @@ export function runSimulation(nodes) {
   if (!tissue) tissue = { key: 'subcutaneous', ...TISSUES.subcutaneous };
   if (!material) material = { key: 'platinum', ...MATERIALS.platinum };
 
-  // ---- Compute Randles circuit parameters ----
+  // ---- Compute Physics parameters ----
   const timeInBodyDays = isChronic ? 30 : 1;
-  const { rSolution, rCt, cDl, aw, fbrFactor } = electrodeParams(material, electrodeArea, timeInBodyDays);
+  const { rCt, cDl, aw, fbrFactor, area_cm2 } = electrodeParams(material, electrodeArea, timeInBodyDays);
+  
+  // Convert area to radius in meters (assuming circular disk electrode)
+  const radius_m = Math.sqrt((electrodeArea * 1e-12) / Math.PI);
+
+  // Spreading resistance based on Newman's formula: R = rho / 4r
+  const rSolution_SAR = tissue.rho0 / (4 * radius_m);
 
   // ---- Charge Injection Capacity & SAR ----
-  const chargeCapacityTotal = (material.eis_factor > 1 ? 0.1 : 3.0) * (electrodeArea * 1e-6); // mC
+  const chargeCapacityTotal = material.cil * area_cm2 * 1000; // mC
   const pulseWidth_ms = 0.5;
   const injectedCharge = current_mA * pulseWidth_ms / 1000; // mC
   const cicSafe = injectedCharge <= chargeCapacityTotal;
   
   // Joule Heating (SAR proxy): P = I^2 * R
-  const powerDissipated_mW = (current_mA * current_mA * rSolution) / 1000;
+  const powerDissipated_mW = (current_mA * current_mA * rSolution_SAR) / 1000;
   // Approx temp rise: dT = P / (mass * heat_capacity), very simplified
   const tempRise_C = (powerDissipated_mW * 0.05).toFixed(2);
 
@@ -255,10 +269,10 @@ export function runSimulation(nodes) {
   for (let logF = 0; logF <= 5; logF += 0.1) {
     const f = Math.pow(10, logF);
 
-    // Tissue impedance (Cole-Cole)
-    const zTissue = coleColeImpedance(f, tissue);
-    // Electrode impedance (Randles)
-    const zElectrode = randlesImpedance(f, rSolution, rCt, cDl, aw);
+    // Tissue impedance (Cole-Cole with Newman spreading resistance)
+    const zTissue = coleColeImpedance(f, tissue, radius_m);
+    // Electrode interface impedance (Randles interface only, no redundant spreading resistance)
+    const zElectrode = randlesImpedance(f, 0, rCt, cDl, aw);
 
     // Total = tissue + electrode in series
     const zReal = zTissue.real + zElectrode.real;
@@ -307,9 +321,9 @@ export function runSimulation(nodes) {
 
   // ---- Noise Budget (physics-grounded) ----
   const bandwidth = 10000; // 10 kHz measurement bandwidth
-  const thermalNoise = Math.sqrt(4 * kT * (rCt + rSolution) * bandwidth) * 1e6; // µV
+  const thermalNoise = Math.sqrt(4 * kT * (rCt + rSolution_SAR) * bandwidth) * 1e6; // µV
   const amplifierNoise = hasAmplifier ? 0.8 : 1.6; // Good amplifier reduces noise
-  const motionNoiseBase = tissue.key === 'skin_epidermis' ? 3.0 : tissue.key === 'cardiac' ? 2.5 : 1.2;
+  const motionNoiseBase = tissue.name === 'Skin (Epidermis)' ? 3.0 : tissue.name === 'Cardiac Muscle' ? 2.5 : 1.2;
   const motionNoise = hasFilter ? motionNoiseBase * 0.5 : motionNoiseBase;
   const biologicalNoise = tissue.noise_uV;
   const shotNoise = 0.3;
@@ -350,16 +364,16 @@ export function runSimulation(nodes) {
     electrodeArea,
     timeInBodyDays,
     fbrFactor: fbrFactor.toFixed(2),
-    chargeCapacityTotal: chargeCapacityTotal.toFixed(2),
-    injectedCharge: injectedCharge.toFixed(2),
+    chargeCapacityTotal: chargeCapacityTotal.toExponential(2),
+    injectedCharge: injectedCharge.toExponential(2),
     cicSafe,
     tempRise_C,
     physicsParams: {
-      r0: tissue.r0,
-      r_inf: tissue.r_inf,
+      r0: tissue.rho0,
+      r_inf: tissue.rho_inf,
       tau: tissue.tau,
       cole_alpha: tissue.cole_alpha,
-      rSolution: rSolution.toFixed(0),
+      rSolution: rSolution_SAR.toFixed(0),
       rCt: rCt.toExponential(2),
       cDl: cDl.toExponential(2),
       aw: aw.toExponential(2)
