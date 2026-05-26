@@ -1,0 +1,97 @@
+/* src/global.css */
+/* Import Inter font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+:root {
+  /* Light theme */
+  --color-background: hsl(210, 20%, 98%);
+  --color-surface: hsl(210, 20%, 100%);
+  --color-surface-raised: hsl(210, 20%, 95%);
+  --color-text-primary: hsl(210, 15%, 20%);
+  --color-border: hsl(210, 10%, 85%);
+  --color-accent-primary: hsl(220, 80%, 50%);
+  --color-accent-secondary: hsl(340, 70%, 50%);
+}
+
+.dark {
+  /* Dark theme */
+  --color-background: hsl(210, 20%, 10%);
+  --color-surface: hsl(210, 20%, 12%);
+  --color-surface-raised: hsl(210, 20%, 15%);
+  --color-text-primary: hsl(210, 5%, 90%);
+  --color-border: hsl(210, 10%, 30%);
+  --color-accent-primary: hsl(220, 80%, 60%);
+  --color-accent-secondary: hsl(340, 70%, 60%);
+}
+
+/* Global resets */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: 'Inter', sans-serif;
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Utility classes */
+.glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dark .glass-card {
+  background: rgba(0, 0, 0, 0.2);
+  border-color: var(--color-border);
+}
+
+.btn-primary {
+  background: var(--color-accent-primary);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: hsl(220, 80%, 45%);
+}
+
+.btn-secondary {
+  background: var(--color-accent-secondary);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: hsl(340, 70%, 45%);
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-out both;
+}
