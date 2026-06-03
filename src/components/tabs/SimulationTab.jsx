@@ -58,7 +58,7 @@ export default function SimulationTab({ data, isRunning }) {
     );
   }
 
-  const { eisData, nyquistData, noiseSources, impedance1kHz, noiseTotal, snr, signalDetectable, physicsParams, safetyMargins, designVariants } = data;
+  const { eisData, nyquistData, noiseSources, impedance1kHz, noiseTotal, snr, signalDetectable, physicsParams } = data;
   const snrOk = signalDetectable;
 
   return (

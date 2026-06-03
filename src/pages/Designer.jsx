@@ -13,38 +13,58 @@ import '../Designer.css';
 
 export default function Designer() {
   const [scenarioId, setScenarioId] = useState(null); // null means blank canvas
-  const [history, setHistory] = useState([{ nodes: [], edges: [] }]);
-  const [historyIndex, setHistoryIndex] = useState(0);
-  const nodes = history[historyIndex].nodes;
-  const edges = history[historyIndex].edges;
+  const [state, setState] = useState({
+    history: [{ nodes: [], edges: [] }],
+    index: 0
+  });
+  const nodes = state.history[state.index].nodes;
+  const edges = state.history[state.index].edges;
   
   const setNodes = useCallback((newNodes) => {
-    const nextNodes = typeof newNodes === 'function' ? newNodes(nodes) : newNodes;
-    if (nextNodes === nodes) return;
-    setHistory(prev => {
-      const newHistory = prev.slice(0, historyIndex + 1);
-      return [...newHistory, { nodes: nextNodes, edges }];
+    setState(prev => {
+      const currentNodes = prev.history[prev.index].nodes;
+      const nextNodes = typeof newNodes === 'function' ? newNodes(currentNodes) : newNodes;
+      if (nextNodes === currentNodes) return prev;
+      
+      const newHistory = prev.history.slice(0, prev.index + 1);
+      return {
+        history: [...newHistory, { nodes: nextNodes, edges: prev.history[prev.index].edges }],
+        index: prev.index + 1
+      };
     });
-    setHistoryIndex(prev => prev + 1);
-  }, [nodes, edges, historyIndex]);
+  }, []);
 
   const setEdges = useCallback((newEdges) => {
-    const nextEdges = typeof newEdges === 'function' ? newEdges(edges) : newEdges;
-    if (nextEdges === edges) return;
-    setHistory(prev => {
-      const newHistory = prev.slice(0, historyIndex + 1);
-      return [...newHistory, { nodes, edges: nextEdges }];
+    setState(prev => {
+      const currentEdges = prev.history[prev.index].edges;
+      const nextEdges = typeof newEdges === 'function' ? newEdges(currentEdges) : newEdges;
+      if (nextEdges === currentEdges) return prev;
+      
+      const newHistory = prev.history.slice(0, prev.index + 1);
+      return {
+        history: [...newHistory, { nodes: prev.history[prev.index].nodes, edges: nextEdges }],
+        index: prev.index + 1
+      };
     });
-    setHistoryIndex(prev => prev + 1);
-  }, [nodes, edges, historyIndex]);
+  }, []);
 
   const handleUndo = useCallback(() => {
-    if (historyIndex > 0) setHistoryIndex(prev => prev - 1);
-  }, [historyIndex]);
+    setState(prev => {
+      if (prev.index > 0) {
+        return { ...prev, index: prev.index - 1 };
+      }
+      return prev;
+    });
+  }, []);
 
   const handleRedo = useCallback(() => {
-    if (historyIndex < history.length - 1) setHistoryIndex(prev => prev + 1);
-  }, [historyIndex, history.length]);
+    setState(prev => {
+      if (prev.index < prev.history.length - 1) {
+        return { ...prev, index: prev.index + 1 };
+      }
+      return prev;
+    });
+  }, []);
 
   const [selectedNode, setSelectedNode] = useState(null);
   
@@ -139,7 +159,7 @@ export default function Designer() {
         else if (scenarioId === 5) setExternalMessage(`Explain the design context for the Implantable Drug Delivery Device.`);
       }, 0);
     }
-  }, [scenarioId]);
+  }, [scenarioId, setNodes, setEdges]);
 
   const handleSimulate = useCallback(() => {
     if (nodes.length === 0) { addToast('Canvas is empty — add components first', 'warning'); return; }
@@ -157,7 +177,7 @@ export default function Designer() {
       addLog(`Impedance @ 1kHz: ${data.impedance1kHz} | Total noise: ${data.noiseTotal} µVrms | SNR: ${data.snr} dB`);
       addToast('Simulation complete');
     }, 1500);
-  }, [nodes, edges, scenarioId, annotateEdgesWithSimulation]);
+  }, [nodes, edges, scenarioId, annotateEdgesWithSimulation, setEdges]);
 
   const handleRunDRC = useCallback(() => {
     if (nodes.length === 0) { addToast('Canvas is empty — add components first', 'warning'); return; }
@@ -187,7 +207,7 @@ export default function Designer() {
          addLog(`DRC complete — 0 errors, ${results.warnings.length} warnings, ${results.passed} checks passed`, 'success');
       }
     }, 800);
-  }, [nodes, edges, scenarioId]);
+  }, [nodes, edges, scenarioId, setNodes]);
 
   const handleUpdateNode = (id, newData) => {
     setNodes(nds => nds.map(n => {
@@ -241,7 +261,7 @@ export default function Designer() {
     spice += `* Tissue: ${simulationData.tissue} | Electrode: ${simulationData.material} (${simulationData.electrodeArea} um2)\n\n`;
     
     // Create SPICE nodes
-    nodes.forEach((n, idx) => {
+    nodes.forEach((n) => {
        const nId = n.id.replace(/-/g, '_');
        if (n.type === 'biology' || n.data?.type === 'tissue') {
            spice += `* Tissue Component: ${n.data.label}\n`;
@@ -325,8 +345,7 @@ export default function Designer() {
 
   const handleNewProject = () => {
     setScenarioId(null);
-    setHistory([{ nodes: [], edges: [] }]);
-    setHistoryIndex(0);
+    setState({ history: [{ nodes: [], edges: [] }], index: 0 });
     setSimulationData(null);
     setDrcResults(null);
     setSelectedNode(null);

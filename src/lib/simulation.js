@@ -202,7 +202,7 @@ export function runSimulation(nodes) {
   let hasAmplifier = false;
   let hasFilter = false;
   let isChronic = false;
-  let voltage = 3.3; // Default system voltage for SAR calc
+
   let current_mA = 2.0; // Default stimulation current
 
   for (const node of nodes) {
@@ -226,7 +226,7 @@ export function runSimulation(nodes) {
         if (mm) material = mm;
       }
       if (d.chronic) isChronic = true;
-      if (d.voltage) voltage = Number(String(d.voltage).replace(/[^0-9.]/g, ''));
+
       if (d.current) current_mA = Number(String(d.current).replace(/[^0-9.]/g, ''));
     }
 
