@@ -124,15 +124,19 @@ export default function Designer() {
 
   const annotateEdgesWithSimulation = useCallback((rawEdges, data) => {
     if (!data) return rawEdges;
-    return rawEdges.map(edge => {
+    let hasChanges = false;
+    const newEdges = rawEdges.map(edge => {
       if (edge.data?.type === 'bio') {
+        hasChanges = true;
         return { ...edge, data: { ...edge.data, label: data.impedance1kHz } };
       }
       if (edge.data?.type === 'mixed' && edge.data?.label) {
+        hasChanges = true;
         return { ...edge, data: { ...edge.data, label: data.signal || edge.data.label } };
       }
       return edge;
     });
+    return hasChanges ? newEdges : rawEdges;
   }, []);
 
   useEffect(() => {
@@ -160,6 +164,14 @@ export default function Designer() {
       }, 0);
     }
   }, [scenarioId, setNodes, setEdges]);
+
+  useEffect(() => {
+    // Keep simulation results updated if nodes/edges change
+    if (simulationData) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setEdges(prev => annotateEdgesWithSimulation(prev, simulationData));
+    }
+  }, [nodes, scenarioId, annotateEdgesWithSimulation, setEdges, simulationData]);
 
   const handleSimulate = useCallback(() => {
     if (nodes.length === 0) { addToast('Canvas is empty — add components first', 'warning'); return; }
